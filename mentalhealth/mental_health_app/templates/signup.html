@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="text-center mb-5">
+                        <h1 class="display-4 fw-bold text-white mb-3">{% if is_admin %}Join as Admin{% else %}Join Students Care{% endif %}</h1>
+                        <p class="lead text-white-50">{% if is_admin %}Create your admin account{% else %}Start your journey towards better mental health today{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Signup Form -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 fade-in">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="feature-icon mx-auto mb-3">
+                            <i class="fas fa-user-plus text-white"></i>
+                        </div>
+                        <h2 class="card-title fw-bold text-primary mb-2">Create Your Account</h2>
+                        <p class="text-muted">Join thousands of students taking care of their mental health</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4" role="alert">
+                                {{ message }}
+                                <button type="button class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" class="user">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="first_name" name="first_name"
+                                           placeholder="First Name" required>
+                                    <label for="first_name">
+                                        <i class="fas fa-user me-2"></i>First Name
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="last_name" name="last_name"
+                                           placeholder="Last Name" required>
+                                    <label for="last_name">
+                                        <i class="fas fa-user me-2"></i>Last Name
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="username" name="username"
+                                   placeholder="Username" required>
+                            <label for="username">
+                                <i class="fas fa-at me-2"></i>Username
+                            </label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="Email Address" required>
+                            <label for="email">
+                                <i class="fas fa-envelope me-2"></i>Email Address
+                            </label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password1" name="password1"
+                                   placeholder="Password" required>
+                            <label for="password1">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control" id="password2" name="password2"
+                                   placeholder="Confirm Password" required>
+                            <label for="password2">
+                                <i class="fas fa-lock me-2"></i>Confirm Password
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="mb-0">Already have an account?
+                            <a href="{% url 'user_login' %}{% if is_admin %}?admin=true{% endif %}" class="text-primary fw-bold text-decoration-none">
+                                Sign in here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

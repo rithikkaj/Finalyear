@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4">
+                <i class="fas fa-wind text-primary"></i> Breathing Exercise
+            </h1>
+            <p class="lead mb-5">Follow the animation to practice deep breathing. Inhale slowly, hold, then exhale. Repeat to reduce stress and promote relaxation.</p>
+
+            <div class="breathing-container">
+                <div class="breathing-circle" id="breathingCircle"></div>
+                <div class="instruction" id="instruction">Get Ready</div>
+            </div>
+
+            <div class="mt-4">
+                <button class="btn btn-primary btn-lg me-3" id="startBtn">
+                    <i class="fas fa-play"></i> Start Exercise
+                </button>
+                <button class="btn btn-outline-secondary btn-lg" id="stopBtn" disabled>
+                    <i class="fas fa-stop"></i> Stop
+                </button>
+            </div>
+
+            <div class="mt-4">
+                <small class="text-muted">Tip: Place one hand on your belly and feel it rise and fall with each breath.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.breathing-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    margin: 2rem 0;
+}
+
+.breathing-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 4s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.breathing-circle.inhale {
+    transform: scale(1.5);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4);
+}
+
+.breathing-circle.hold {
+    transform: scale(1.5);
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    box-shadow: 0 15px 40px rgba(79, 172, 254, 0.4);
+}
+
+.breathing-circle.exhale {
+    transform: scale(1);
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    box-shadow: 0 10px 30px rgba(67, 233, 123, 0.3);
+}
+
+.instruction {
+    margin-top: 2rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #495057;
+    transition: color 0.5s ease;
+}
+
+.instruction.inhale {
+    color: #f5576c;
+}
+
+.instruction.hold {
+    color: #00f2fe;
+}
+
+.instruction.exhale {
+    color: #38f9d7;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const circle = document.getElementById('breathingCircle');
+    const instruction = document.getElementById('instruction');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+
+    let interval;
+    let isRunning = false;
+
+    function startBreathing() {
+        if (isRunning) return;
+        isRunning = true;
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+
+        let phase = 0;
+        const phases = [
+            { action: 'inhale', duration: 4000, text: 'Inhale Slowly' },
+            { action: 'hold', duration: 4000, text: 'Hold Your Breath' },
+            { action: 'exhale', duration: 4000, text: 'Exhale Slowly' },
+            { action: 'hold', duration: 2000, text: 'Pause' }
+        ];
+
+        function nextPhase() {
+            const currentPhase = phases[phase % phases.length];
+            circle.className = 'breathing-circle ' + currentPhase.action;
+            instruction.className = 'instruction ' + currentPhase.action;
+            instruction.textContent = currentPhase.text;
+
+            setTimeout(() => {
+                phase++;
+                if (isRunning) nextPhase();
+            }, currentPhase.duration);
+        }
+
+        nextPhase();
+    }
+
+    function stopBreathing() {
+        isRunning = false;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        circle.className = 'breathing-circle';
+        instruction.className = 'instruction';
+        instruction.textContent = 'Get Ready';
+    }
+
+    startBtn.addEventListener('click', startBreathing);
+    stopBtn.addEventListener('click', stopBreathing);
+});
+</script>
+{% endblock %}

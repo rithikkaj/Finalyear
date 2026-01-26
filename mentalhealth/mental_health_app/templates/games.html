@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-gamepad text-warning"></i> Relaxation Games
+        </h2>
+        <p class="text-center mb-5">Take a break and enjoy these calming games designed to reduce stress and improve your wellbeing.</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for game in games %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-puzzle-piece fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">{{ game.name }}</h5>
+                    <p class="card-text">{{ game.description }}</p>
+                    {% if game.name == "Meditation Timer" %}
+                        <a href="{% url 'meditation' %}" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Play Now
+                        </a>
+                    {% elif game.name == "Breathing Exercise" %}
+                        <a href="{% url 'breathing' %}" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Play Now
+                        </a>
+                    {% elif game.name == "Puzzle Game" %}
+                        <a href="{% url 'puzzle' %}" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Play Now
+                        </a>
+                    {% elif game.name == "Memory Puzzle" %}
+                        <a href="{% url 'memory_puzzle' %}" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Play Now
+                        </a>
+                    {% else %}
+                        <a href="{{ game.url }}" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Play Now
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-plus-circle fa-3x text-muted mb-3"></i>
+                    <h5 class="card-title">No Games Available</h5>
+                    <p class="card-text">Games will be added soon. Check back later!</p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5 class="card-title">Benefits of Playing Games</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <i class="fas fa-brain fa-2x text-success mb-2"></i>
+                        <p>Improves cognitive function</p>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fas fa-smile fa-2x text-warning mb-2"></i>
+                        <p>Reduces stress and anxiety</p>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fas fa-users fa-2x text-info mb-2"></i>
+                        <p>Enhances social skills</p>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fas fa-moon fa-2x text-primary mb-2"></i>
+                        <p>Promotes relaxation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

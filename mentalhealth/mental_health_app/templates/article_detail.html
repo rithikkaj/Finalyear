@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 40vh; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center text-white">
+                <h1 class="display-4 fw-bold mb-3">{{ article.title }}</h1>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <div class="author-avatar me-3">
+                            <i class="fas fa-user-circle fa-2x"></i>
+                        </div>
+                        <div class="text-start">
+                            <h5 class="mb-1">{{ article.author }}</h5>
+                            <small class="opacity-75">
+                                <i class="fas fa-calendar me-1"></i>{{ article.publish_date|date:"F d, Y" }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'articles' %}">Articles</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ article.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <article class="article-content">
+                <div class="card border-0 shadow-sm" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'); background-size: cover; background-position: center; background-attachment: fixed;">
+                    <div class="card-body p-4 p-md-5" style="background: rgba(255, 255, 255, 0.9);">
+                        {{ article.content|safe }}
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article Actions -->
+            <div class="mt-4 d-flex justify-content-between align-items-center">
+                <a href="{% url 'articles' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Articles
+                </a>
+                <div class="article-actions">
+                    <button class="btn btn-light me-2" title="Share">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <button class="btn btn-light" title="Bookmark">
+                        <i class="fas fa-bookmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Related Articles Section -->
+            <div class="mt-5">
+                <h3 class="h4 mb-4 text-primary">Related Articles</h3>
+                <div class="row">
+                    <!-- Placeholder for related articles -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Coming Soon</h6>
+                                <p class="card-text text-muted">More articles on mental health topics will be available soon.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+    color: #2c3e50;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.article-content h1 { font-size: 2.5rem; }
+.article-content h2 { font-size: 2rem; }
+.article-content h3 { font-size: 1.75rem; }
+
+.article-content p {
+    margin-bottom: 1.5rem;
+    color: #555;
+}
+
+.article-content ul,
+.article-content ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+}
+
+.article-content li {
+    margin-bottom: 0.5rem;
+}
+
+.article-content blockquote {
+    border-left: 4px solid #667eea;
+    padding-left: 1rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: #666;
+}
+
+.article-content .highlight {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+    margin: 1.5rem 0;
+}
+
+.author-avatar {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.article-actions .btn {
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.article-actions .btn:hover {
+    background-color: #e9ecef;
+    transform: scale(1.1);
+    transition: all 0.2s ease;
+}
+
+.hero-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.hero-section > .container {
+    position: relative;
+    z-index: 2;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4">
+                <i class="fas fa-puzzle-piece text-warning"></i> 8-Puzzle Game
+            </h1>
+            <p class="lead mb-5">Slide the tiles to arrange them in order from 1 to 8. The empty space should be in the bottom-right corner.</p>
+
+            <div class="puzzle-container mb-4">
+                <div class="puzzle-grid" id="puzzleGrid"></div>
+            </div>
+
+            <div class="mb-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Moves</h5>
+                                <h2 id="moves">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Status</h5>
+                                <h2 id="status">Playing</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <button class="btn btn-primary btn-lg me-3" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <a href="{% url 'games' %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-arrow-left"></i> Back to Games
+                </a>
+            </div>
+
+            <div id="message" class="alert alert-success" style="display: none;">
+                <h4 class="alert-heading">Congratulations! 🎉</h4>
+                <p>You solved the puzzle!</p>
+                <hr>
+                <p class="mb-0">Great job! Try again for a better score.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">How to Play</h5>
+                    <ul class="text-start">
+                        <li>Click on tiles adjacent to the empty space to move them</li>
+                        <li>Arrange tiles in numerical order from 1 to 8</li>
+                        <li>The empty space should end up in the bottom-right corner</li>
+                        <li>Try to solve it in as few moves as possible!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.puzzle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+.puzzle-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+}
+
+.puzzle-tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 1.8rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    aspect-ratio: 1;
+}
+
+.puzzle-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.puzzle-tile.empty {
+    background: #f8f9fa;
+    cursor: default;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.puzzle-tile.solved {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+}
+
+.puzzle-tile.movable {
+    border: 2px solid #ff9900;
+    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.5);
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const grid = document.getElementById('puzzleGrid');
+    const movesDisplay = document.getElementById('moves');
+    const statusDisplay = document.getElementById('status');
+    const resetBtn = document.getElementById('resetBtn');
+    const messageDiv = document.getElementById('message');
+
+    let tiles = [];
+    let moves = 0;
+    let solved = false;
+
+    function initializePuzzle() {
+        const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+        tiles = shuffleArray([...numbers]);
+        moves = 0;
+        solved = false;
+        movesDisplay.textContent = moves;
+        statusDisplay.textContent = 'Playing';
+        messageDiv.style.display = 'none';
+        createTiles();
+    }
+
+    function shuffleArray(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function createTiles() {
+        grid.innerHTML = '';
+        tiles.forEach((tile, index) => {
+            const tileElement = document.createElement('div');
+            tileElement.className = `puzzle-tile ${tile === 0 ? 'empty' : ''} ${solved ? 'solved' : ''} fade-in`;
+            tileElement.textContent = tile !== 0 ? tile : '';
+            tileElement.dataset.index = index;
+            tileElement.addEventListener('click', () => moveTile(index));
+            grid.appendChild(tileElement);
+        });
+        updateMovableTiles();
+    }
+
+    function getEmptyTileIndex() {
+        return tiles.indexOf(0);
+    }
+
+    function canMove(index) {
+        const emptyIndex = getEmptyTileIndex();
+        const row = Math.floor(index / 3);
+        const col = index % 3;
+        const emptyRow = Math.floor(emptyIndex / 3);
+        const emptyCol = emptyIndex % 3;
+
+        return (
+            (row === emptyRow && Math.abs(col - emptyCol) === 1) ||
+            (col === emptyCol && Math.abs(row - emptyRow) === 1)
+        );
+    }
+
+    function moveTile(index) {
+        if (!canMove(index) || solved) return;
+
+        const newTiles = [...tiles];
+        const emptyIndex = getEmptyTileIndex();
+        [newTiles[index], newTiles[emptyIndex]] = [newTiles[emptyIndex], newTiles[index]];
+
+        tiles = newTiles;
+        moves++;
+        movesDisplay.textContent = moves;
+
+        if (checkSolved(tiles)) {
+            solved = true;
+            statusDisplay.textContent = 'Solved!';
+            messageDiv.style.display = 'block';
+            // Scroll to message
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        createTiles();
+    }
+
+    function checkSolved(currentTiles) {
+        return currentTiles.every((tile, index) => {
+            if (index === 8) return tile === 0;
+            return tile === index + 1;
+        });
+    }
+
+    function updateMovableTiles() {
+        const tileElements = document.querySelectorAll('.puzzle-tile');
+        tileElements.forEach((tile, index) => {
+            if (tile.classList.contains('empty')) return;
+            if (canMove(index) && !solved) {
+                tile.classList.add('movable');
+            } else {
+                tile.classList.remove('movable');
+            }
+        });
+    }
+
+    resetBtn.addEventListener('click', initializePuzzle);
+
+    // Initialize game
+    initializePuzzle();
+});
+</script>
+{% endblock %}

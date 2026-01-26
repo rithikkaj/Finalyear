@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+    body {
+        background: linear-gradient(to bottom right, #e0f2fe, #f0f9ff, #f3e8ff);
+        min-height: 100vh;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .articles-hero {
+        background: linear-gradient(135deg, rgba(251, 252, 254, 0.3), rgba(255, 255, 255, 0.3)),
+                    url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=2896&q=80');
+        background-size: cover;
+        background-position: center;
+        padding: 4rem 0;
+        color: #2d3748;
+        text-align: center;
+    }
+
+    .articles-hero h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .articles-hero p {
+        font-size: 1.25rem;
+        margin-bottom: 0;
+        opacity: 0.9;
+    }
+
+    .article-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        height: 100%;
+        border: none;
+    }
+
+    .article-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .article-image {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .article-content {
+        padding: 1.5rem;
+    }
+
+    .category-badge {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .article-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+    }
+
+    .article-excerpt {
+        color: #718096;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .read-more-btn {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .read-more-btn:hover {
+        color: #764ba2;
+        transform: translateX(5px);
+    }
+
+    .stats-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 3rem 0;
+    }
+
+    .stat-item {
+        text-align: center;
+        color: white;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: white;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        opacity: 0.7;
+        margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .articles-hero h1 {
+            font-size: 2.5rem;
+        }
+
+        .articles-hero p {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="articles-hero">
+    <div class="container">
+        <h1>Mental Health Articles</h1>
+        <p>Discover insights, coping strategies, and expert guidance for better mental wellbeing</p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="stat-number">{{ articles|length }}</div>
+                    <div class="stat-label">Articles Available</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support Available</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Lives Helped</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles Grid -->
+    {% if articles %}
+    <div class="row g-4">
+        {% for article in articles %}
+        <div class="col-lg-4 col-md-6">
+            <div class="article-card">
+                <img src="{{ article.image_url|default:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80' }}" alt="{{ article.title }}" class="article-image">
+                <div class="article-content">
+                    <div class="category-badge">
+                        <i class="fas fa-tag"></i>
+                        {{ article.category|default:"General" }}
+                    </div>
+                    <h3 class="article-title">{{ article.title }}</h3>
+                    <p class="article-excerpt">{{ article.content|striptags|truncatewords:20 }}</p>
+                    <a href="{% url 'article_detail' article.slug %}" class="read-more-btn">
+                        Read More
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-book-open"></i>
+        <h3>No Articles Available</h3>
+        <p>We're working on bringing you amazing content. Check back soon!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+ {% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mt-5 shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">
+                        <i class="fas fa-user-plus text-primary"></i> Choose Account Type
+                    </h2>
+                    <p class="text-center text-muted mb-4">Please select the type of account you would like to create</p>
+
+                    <div class="row g-4">
+                        <!-- User Signup Card -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-primary">
+                                <div class="card-body text-center p-4">
+                                    <div class="feature-icon mx-auto mb-3">
+                                        <i class="fas fa-user text-primary" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h5 class="card-title text-primary mb-3">User Account</h5>
+                                    <p class="card-text text-muted mb-4">Create a personal account to access mental health assessments, wellness tools, and track your progress.</p>
+                                    <a href="{% url 'user_signup' %}" class="btn btn-primary btn-lg w-100">
+                                        <i class="fas fa-user-plus me-2"></i>Sign Up as User
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admin Signup Card -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-danger">
+                                <div class="card-body text-center p-4">
+                                    <div class="feature-icon mx-auto mb-3">
+                                        <i class="fas fa-user-shield text-danger" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h5 class="card-title text-danger mb-3">Administrator Account</h5>
+                                    <p class="card-text text-muted mb-4">Create an administrator account to manage users and oversee the mental health platform.</p>
+                                    <a href="{% url 'admin_signup' %}" class="btn btn-danger btn-lg w-100">
+                                        <i class="fas fa-user-plus me-2"></i>Sign Up as Admin
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-2">Already have an account?</p>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Existing Account
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="{% url 'home' %}" class="text-decoration-none">
+                            <i class="fas fa-home me-1"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="text-center mb-5">
+                        <h1 class="display-4 fw-bold text-white mb-3">{% if is_admin %}Admin Login{% else %}Welcome Back{% endif %}</h1>
+                        <p class="lead text-white-50">{% if is_admin %}Access your admin dashboard{% else %}Continue your mental health journey{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Login Form -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 fade-in">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="feature-icon mx-auto mb-3">
+                            <i class="fas fa-sign-in-alt text-white"></i>
+                        </div>
+                        <h2 class="card-title fw-bold text-primary mb-2">Sign In</h2>
+                        <p class="text-muted">Access your account to continue</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4" role="alert">
+                                {{ message }}
+                                <button type="button class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="Email Address">
+                            <label for="email">
+                                <i class="fas fa-envelope me-2"></i>Email Address
+                            </label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control" id="password" name="password" required placeholder="Password">
+                            <label for="password">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="mb-0">Don't have an account?
+                            <a href="{% url 'signup' %}{% if is_admin %}?admin=true{% endif %}" class="text-primary fw-bold text-decoration-none">
+                                Sign up here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

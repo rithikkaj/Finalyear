@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="feature-icon bg-white text-primary me-3">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">Students Care Support Chat</h4>
+                            <small>I'm here to listen and support students</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Chat Messages Container -->
+                    <div id="chatContainer" class="chat-messages mb-4" style="height: 400px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 10px; padding: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                        {% if chat_logs %}
+                        {% for log in chat_logs %}
+                        <!-- User Message -->
+                        <div class="message user-message mb-3">
+                            <div class="d-flex justify-content-end">
+                                <div class="message-bubble user-bubble">
+                                    <strong>You:</strong> {{ log.message }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bot Response -->
+                        <div class="message bot-message mb-3">
+                            <div class="d-flex justify-content-start">
+                                <div class="bot-avatar me-3">
+                                    <i class="fas fa-robot text-primary"></i>
+                                </div>
+                                <div class="message-bubble bot-bubble">
+                        <strong>Students Care Assistant:</strong> {{ log.response }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <!-- Welcome Message -->
+                        <div class="text-center py-5">
+                            <div class="bot-avatar mb-3 mx-auto" style="width: 60px; height: 60px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-robot fa-2x text-white"></i>
+                            </div>
+                            <h5 class="text-muted mb-3">Welcome to Students Care Support</h5>
+                            <p class="text-muted">I'm here to provide emotional support and listen to your concerns. Feel free to share what's on your mind - your conversations are completely confidential.</p>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Remember:</strong> While I can offer support, I'm not a substitute for professional student support services. If you're in crisis, please contact a counselor, healthcare professional, or emergency services.
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Message Input Form -->
+                    <form method="post" id="chatForm">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <textarea
+                                name="message"
+                                id="messageInput"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Share what's on your mind... How are you feeling today?"
+                                required
+                                style="resize: none; border-radius: 20px 0 0 20px; border-right: none;"
+                            ></textarea>
+                            <button type="submit" class="btn btn-primary" style="border-radius: 0 20px 20px 0; padding: 0 25px;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="form-text text-muted mt-2">
+                            <small><i class="fas fa-lock me-1"></i>Your messages are private and secure</small>
+                        </div>
+                    </form>
+
+                    <!-- Quick Suggestion Buttons -->
+                    <div class="mt-4">
+                        <p class="text-muted mb-2"><small>Quick topics to get started:</small></p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-secondary btn-sm suggestion-btn" data-message="I'm feeling anxious today">Feeling Anxious</button>
+                            <button class="btn btn-outline-secondary btn-sm suggestion-btn" data-message="I need someone to talk to">Need to Talk</button>
+                            <button class="btn btn-outline-secondary btn-sm suggestion-btn" data-message="Having trouble sleeping">Sleep Issues</button>
+                            <button class="btn btn-outline-secondary btn-sm suggestion-btn" data-message="Feeling stressed about studies">Study Stress</button>
+                            <button class="btn btn-outline-secondary btn-sm suggestion-btn" data-message="I'm feeling lonely">Feeling Lonely</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>Confidential
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>24/7 Available
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <i class="fas fa-user-check me-1"></i>Non-judgmental
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chat-messages {
+    scroll-behavior: smooth;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    margin-bottom: 8px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.user-bubble {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.bot-bubble {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.bot-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.feature-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.suggestion-btn {
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.suggestion-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#messageInput:focus {
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    border-color: #667eea;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #5a6fd8, #6a4190);
+    border-color: #5a6fd8;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-scroll to bottom of chat
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // Handle suggestion buttons
+    document.querySelectorAll('.suggestion-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const message = this.getAttribute('data-message');
+            document.getElementById('messageInput').value = message;
+            document.getElementById('messageInput').focus();
+        });
+    });
+
+    // Auto-resize textarea
+    const messageInput = document.getElementById('messageInput');
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Handle form submission with AJAX
+    document.getElementById('chatForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalHtml = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        submitBtn.disabled = true;
+
+        // Append user message
+        appendMessage('user', message);
+
+        // Clear input
+        messageInput.value = '';
+
+        // Send AJAX request
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({
+                'message': message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Append bot response
+            appendMessage('bot', data.response);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            appendMessage('bot', 'Sorry, there was an error processing your message.');
+        })
+        .finally(() => {
+            submitBtn.innerHTML = originalHtml;
+            submitBtn.disabled = false;
+        });
+    });
+
+    // Function to append messages
+    function appendMessage(type, text) {
+        const chatContainer = document.getElementById('chatContainer');
+
+        // Clear welcome message if it exists
+        const welcomeMessage = chatContainer.querySelector('.text-center');
+        if (welcomeMessage) {
+            welcomeMessage.remove();
+        }
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}-message mb-3`;
+
+        if (type === 'user') {
+            messageDiv.innerHTML = `
+                <div class="d-flex justify-content-end">
+                    <div class="message-bubble user-bubble">
+                        <strong>You:</strong> ${text}
+                    </div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="d-flex justify-content-start">
+                    <div class="bot-avatar me-3">
+                        <i class="fas fa-robot text-primary"></i>
+                    </div>
+                    <div class="message-bubble bot-bubble">
+                        <strong>MindCare Assistant:</strong> ${text}
+                    </div>
+                </div>
+            `;
+        }
+
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Add fade-in animation
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            messageDiv.style.transition = 'all 0.5s ease';
+            messageDiv.style.opacity = '1';
+            messageDiv.style.transform = 'translateY(0)';
+        }, 100);
+    }
+
+    // Add fade-in animation for messages
+    const messages = document.querySelectorAll('.message');
+    messages.forEach((message, index) => {
+        message.style.opacity = '0';
+        message.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            message.style.transition = 'all 0.5s ease';
+            message.style.opacity = '1';
+            message.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

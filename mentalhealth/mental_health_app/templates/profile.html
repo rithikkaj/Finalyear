@@ -1,0 +1,502 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-4xl font-bold text-gray-800 mb-8" data-testid="profile-title">My Profile</h1>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Profile Card -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+          <div class="flex flex-col items-center">
+            <div class="w-24 h-24 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-user text-white text-3xl"></i>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-2" data-testid="profile-name">{{ user.first_name|default:user.username }}</h2>
+
+            <div class="flex items-center text-gray-600 mb-4">
+              <i class="fas fa-envelope h-4 w-4 mr-2"></i>
+              <span data-testid="profile-email">{{ user.email }}</span>
+            </div>
+
+            <div class="flex items-center text-gray-500 text-sm">
+              <i class="fas fa-calendar h-4 w-4 mr-2"></i>
+              <span>Joined {{ user.date_joined|date:"M j, Y" }}</span>
+            </div>
+
+            <div class="mt-6 w-full">
+              <button
+                onclick="toggleEdit()"
+                class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-semibold hover:shadow-lg transition"
+                id="edit-btn"
+                data-testid="edit-profile-btn"
+              >
+                <i class="fas fa-edit inline mr-2"></i>
+                Edit Profile
+              </button>
+            </div>
+          </div>
+
+          <!-- Edit Form -->
+          <div id="edit-form" class="mt-6 space-y-4 pt-6 border-t border-gray-200 hidden">
+            <form method="post">
+              {% csrf_token %}
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                <input
+                  type="number"
+                  name="age"
+                  value="{{ profile.age|default:'' }}"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                  data-testid="age-input"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                <select
+                  name="gender"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                  data-testid="gender-select"
+                >
+                  <option value="">Select</option>
+                  <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                  <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                  <option value="Other" {% if profile.gender == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value="{{ profile.phone|default:'' }}"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                <textarea
+                  name="address"
+                  rows="3"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                >{{ profile.address|default:'' }}</textarea>
+              </div>
+
+              <!-- Self-Care Reminders Section -->
+              <hr class="my-4">
+              <h4 class="mb-3">
+                <i class="fas fa-heart text-success"></i> Self-Care Reminders
+              </h4>
+              <p class="text-muted small mb-3">Receive daily reminders to take care of your mental health.</p>
+
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="email_reminders" name="email_reminders" {% if profile.email_reminders %}checked{% endif %}>
+                  <label class="form-check-label" for="email_reminders">
+                    <i class="fas fa-envelope text-primary"></i> Receive reminders via Email
+                  </label>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="sms_reminders" name="sms_reminders" {% if profile.sms_reminders %}checked{% endif %}>
+                  <label class="form-check-label" for="sms_reminders">
+                    <i class="fas fa-sms text-success"></i> Receive reminders via SMS (requires phone number)
+                  </label>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="reminder_time" class="form-label">
+                  <i class="fas fa-clock text-warning"></i> Preferred Reminder Time
+                </label>
+                <input type="time" class="form-control" id="reminder_time" name="reminder_time" value="{{ profile.reminder_time|date:'H:i' }}">
+                <div class="form-text">When would you like to receive your daily reminders? (optional)</div>
+              </div>
+
+              <div class="space-y-3">
+                <button
+                  type="submit"
+                  class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-semibold hover:shadow-lg transition"
+                  data-testid="save-profile-btn"
+                >
+                  <i class="fas fa-save inline mr-2"></i>
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onclick="toggleEdit()"
+                  class="w-full py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition"
+                  data-testid="cancel-edit-btn"
+                >
+                  <i class="fas fa-times inline mr-2"></i>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assessment History -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Assessment History</h2>
+
+          {% if assessment_history %}
+            <div class="space-y-4">
+              {% for assessment in assessment_history %}
+                <div
+                  class="border border-gray-200 rounded-xl p-6 hover:border-cyan-300 transition"
+                  data-testid="assessment-history-{{ forloop.counter0 }}"
+                >
+                  <div class="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 class="text-xl font-semibold text-gray-800 capitalize">
+                        {{ assessment.assessment_type }}
+                      </h3>
+                      <p class="text-sm text-gray-500">
+                        {{ assessment.created_at|date:"M j, Y" }}
+                      </p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-3xl font-bold text-cyan-600">{{ assessment.score }}</p>
+                      <p class="text-sm font-medium {% if assessment.level == 'Low Risk' %}low-risk-level{% elif assessment.level == 'Moderate Risk' %}moderate-risk-level{% elif assessment.level == 'High Risk' %}high-risk-level{% endif %}">
+                        {{ assessment.level }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-700 mb-2">Recommendations:</h4>
+                    <ul class="space-y-1">
+                      {% for rec in assessment.recommendations %}
+                        <li class="text-sm text-gray-600">• {{ rec }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-12 text-gray-500">
+              <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+              <p class="text-lg">No assessments taken yet</p>
+              <p class="text-sm mt-2">Take your first assessment to track your mental health</p>
+              <a href="{% url 'assessment' %}" class="btn btn-success btn-lg mt-3">
+                <i class="fas fa-play mr-2"></i>Take Your First Assessment
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+/* Custom gradient backgrounds */
+.bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #ecfeff, #f0f9ff, #faf5ff);
+}
+
+.bg-gradient-to-r {
+  background: linear-gradient(to right, #06b6d4, #3b82f6);
+}
+
+/* Level colors */
+.low-risk-level {
+  color: #16a34a;
+}
+
+.moderate-risk-level {
+  color: #ea580c;
+}
+
+.high-risk-level {
+  color: #dc2626;
+}
+
+/* Custom classes for modern look */
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mt-6 {
+  margin-top: 1.5rem;
+}
+
+.w-24 {
+  width: 6rem;
+}
+
+.h-24 {
+  height: 6rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.p-8 {
+  padding: 2rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-1 > * + * {
+  margin-top: 0.25rem;
+}
+
+.grid {
+  display: grid;
+}
+
+.lg\:grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gap-8 {
+  gap: 2rem;
+}
+
+.lg\:col-span-1 {
+  grid-column: span 1 / span 1;
+}
+
+.lg\:col-span-2 {
+  grid-column: span 2 / span 2;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.inline {
+  display: inline;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-white {
+  color: white;
+}
+
+.text-gray-800 {
+  color: #1f2937;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+.text-gray-700 {
+  color: #374151;
+}
+
+.text-cyan-600 {
+  color: #0891b2;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.border {
+  border-width: 1px;
+}
+
+.border-gray-200 {
+  border-color: #e5e7eb;
+}
+
+.border-gray-300 {
+  border-color: #d1d5db;
+}
+
+.focus\:ring-2:focus {
+  box-shadow: 0 0 0 2px #06b6d4;
+}
+
+.focus\:ring-cyan-500:focus {
+  --tw-ring-color: #06b6d4;
+}
+
+.transition {
+  transition: all 0.15s ease-in-out;
+}
+
+.hover\:shadow-lg:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.hover\:border-cyan-300:hover {
+  border-color: #67e8f9;
+}
+
+.max-w-6xl {
+  max-width: 72rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.hidden {
+  display: none;
+}
+</style>
+
+<script>
+function toggleEdit() {
+  const editForm = document.getElementById('edit-form');
+  const editBtn = document.getElementById('edit-btn');
+
+  if (editForm.classList.contains('hidden')) {
+    editForm.classList.remove('hidden');
+    editBtn.innerHTML = '<i class="fas fa-times inline mr-2"></i>Cancel Edit';
+  } else {
+    editForm.classList.add('hidden');
+    editBtn.innerHTML = '<i class="fas fa-edit inline mr-2"></i>Edit Profile';
+  }
+}
+
+// Add some interactive elements
+document.addEventListener('DOMContentLoaded', function() {
+  // Animate cards on load
+  const cards = document.querySelectorAll('.bg-white');
+  cards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      card.style.transition = 'all 0.6s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, index * 100);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,404 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+.exercise-step {
+    opacity: 1;
+    transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+}
+.exercise-step.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+}
+.exercise-step.fade-in.animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+.progress-bar {
+    transition: width 1s linear;
+}
+.timer-display {
+    font-size: 2rem;
+    font-weight: bold;
+}
+</style>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4">
+                <i class="fas fa-running text-primary"></i> Exercise for Mental Health
+            </h1>
+            <p class="text-center text-muted mb-5">
+                Regular physical activity can significantly improve your mental wellbeing. Choose an exercise that suits your current mood and energy level.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Mindful Walking -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-walking fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">Mindful Walking</h5>
+                    <p class="card-text">Take a gentle walk in nature while focusing on your surroundings and breathing.</p>
+                    <ul class="list-unstyled text-start small">
+                        <li><i class="fas fa-check text-success me-2"></i>Reduces stress and anxiety</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Improves mood</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Enhances mindfulness</li>
+                    </ul>
+                    <button class="btn btn-success mt-3" onclick="startAnimatedExercise('walking')">
+                        <i class="fas fa-play me-2"></i>Start Walking
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gentle Yoga -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-pray fa-3x text-info"></i>
+                    </div>
+                    <h5 class="card-title">Gentle Yoga</h5>
+                    <p class="card-text">Practice gentle yoga poses that promote relaxation and body awareness.</p>
+                    <ul class="list-unstyled text-start small">
+                        <li><i class="fas fa-check text-success me-2"></i>Improves flexibility</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Reduces anxiety</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Enhances body-mind connection</li>
+                    </ul>
+                    <button class="btn btn-info mt-3" data-bs-toggle="modal" data-bs-target="#exerciseModal" data-exercise="yoga">
+                        <i class="fas fa-play me-2"></i>Start Yoga
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stretching Routine -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-child fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="card-title">Stretching Routine</h5>
+                    <p class="card-text">Gentle stretching exercises to release tension and improve circulation.</p>
+                    <ul class="list-unstyled text-start small">
+                        <li><i class="fas fa-check text-success me-2"></i>Relieves muscle tension</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Improves circulation</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Promotes relaxation</li>
+                    </ul>
+                    <button class="btn btn-warning mt-3" data-bs-toggle="modal" data-bs-target="#exerciseModal" data-exercise="stretching">
+                        <i class="fas fa-play me-2"></i>Start Stretching
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animated Exercise Section -->
+    <div class="row mt-5" id="animatedExerciseSection" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-play-circle me-2"></i>Animated Exercise Session</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Progress Bar -->
+                    <div class="progress mb-3">
+                        <div class="progress-bar" id="exerciseProgress" role="progressbar" style="width: 0%"></div>
+                    </div>
+
+                    <!-- Timer Display -->
+                    <div class="text-center mb-3">
+                        <div class="timer-display" id="timerDisplay">00:30</div>
+                        <small class="text-muted">Time remaining for this step</small>
+                    </div>
+
+                    <!-- Step Content -->
+                    <div class="exercise-step">
+                        <h4 id="stepTitle" class="text-center mb-3"></h4>
+                        <p id="stepDescription" class="text-center lead"></p>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-outline-secondary" id="prevBtn" onclick="previousStep()">
+                            <i class="fas fa-arrow-left me-2"></i>Previous
+                        </button>
+                        <button class="btn btn-warning" id="pauseBtn" onclick="togglePause()">
+                            <i class="fas fa-pause me-2"></i>Pause
+                        </button>
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+                            Next<i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exercise Tips -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb text-warning me-2"></i>Exercise Tips for Mental Health</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Start small: Begin with 10-15 minutes and gradually increase</li>
+                                <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Listen to your body: Stop if you feel pain or discomfort</li>
+                                <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Make it social: Exercise with a friend or join a group</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Be consistent: Try to exercise at the same time each day</li>
+                                <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Choose enjoyable activities: Find exercises you actually like</li>
+                                <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Track your progress: Note how you feel before and after</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Exercise Modal -->
+<div class="modal fade" id="exerciseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exerciseModalTitle">Start Exercise</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="exerciseDescription">Choose your exercise duration:</p>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" onclick="startExercise(5)">5 minutes</button>
+                    <button class="btn btn-outline-primary" onclick="startExercise(10)">10 minutes</button>
+                    <button class="btn btn-outline-primary" onclick="startExercise(15)">15 minutes</button>
+                    <button class="btn btn-outline-primary" onclick="startExercise(20)">20 minutes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Exercise Session Modal -->
+<div class="modal fade" id="exerciseSessionModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Guided Exercise Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="endExerciseSession()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Progress Bar -->
+                <div class="progress mb-3">
+                    <div class="progress-bar" id="exerciseProgress" role="progressbar" style="width: 0%"></div>
+                </div>
+
+                <!-- Timer Display -->
+                <div class="text-center mb-3">
+                    <div class="timer-display" id="timerDisplay">00:30</div>
+                    <small class="text-muted">Time remaining for this step</small>
+                </div>
+
+                <!-- Step Content -->
+                <div class="exercise-step">
+                    <h4 id="stepTitle" class="text-center mb-3"></h4>
+                    <p id="stepDescription" class="text-center lead"></p>
+                </div>
+
+                <!-- Controls -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-outline-secondary" id="prevBtn" onclick="previousStep()">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    <button class="btn btn-warning" id="pauseBtn" onclick="togglePause()">
+                        <i class="fas fa-pause me-2"></i>Pause
+                    </button>
+                    <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+                        Next<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+console.log('Exercise script loaded');
+let exerciseTimer;
+let exerciseTime = 0;
+let currentExercise = '';
+let currentStep = 0;
+let stepTimer;
+let stepTimeLeft = 30;
+let isPaused = false;
+let totalSteps = 0;
+
+// Exercise data structures
+const exercises = {
+    walking: [
+        { title: "Preparation", description: "Stand tall with feet shoulder-width apart. Take a deep breath in through your nose and out through your mouth." },
+        { title: "Step 1: Focus on Breathing", description: "Begin walking slowly. Inhale for 4 steps, exhale for 4 steps. Notice the rhythm of your breath." },
+        { title: "Step 2: Observe Surroundings", description: "Look around you. Notice the colors, sounds, and textures. Walk mindfully, one step at a time." },
+        { title: "Step 3: Body Awareness", description: "Feel your feet connecting with the ground. Notice the movement in your legs and arms." },
+        { title: "Cool Down", description: "Slow down your pace. Take a few deep breaths. Notice how you feel." }
+    ],
+    yoga: [
+        { title: "Preparation", description: "Find a quiet space. Stand with feet together, arms at your sides. Close your eyes and breathe deeply." },
+        { title: "Mountain Pose", description: "Stand tall like a mountain. Roll your shoulders back, lift your chest. Breathe steadily." },
+        { title: "Tree Pose", description: "Shift weight to your left foot. Place right foot on left inner thigh. Bring hands to heart center. Balance and breathe." },
+        { title: "Warrior I", description: "Step right foot back. Bend left knee over ankle. Raise arms overhead. Hold and breathe." },
+        { title: "Child's Pose", description: "Kneel and fold forward. Extend arms in front. Rest your forehead on the ground. Breathe deeply." },
+        { title: "Cool Down", description: "Lie on your back. Close your eyes. Notice the effects of your practice." }
+    ],
+    stretching: [
+        { title: "Preparation", description: "Find a comfortable space. Stand or sit comfortably. Take a deep breath to center yourself." },
+        { title: "Neck Stretch", description: "Gently tilt your head to one side, bringing ear to shoulder. Hold for 20-30 seconds. Switch sides." },
+        { title: "Shoulder Rolls", description: "Roll your shoulders forward in a circle 5 times, then backward 5 times. Keep movements slow." },
+        { title: "Arm Circles", description: "Extend arms to sides. Make small circles, gradually increasing size. Reverse direction." },
+        { title: "Seated Forward Bend", description: "Sit with legs extended. Hinge at hips and reach toward toes. Keep back straight." },
+        { title: "Cool Down", description: "Lie down and relax. Scan your body from toes to head. Breathe deeply." }
+    ]
+};
+
+function startExercise(minutes) {
+    $('#exerciseModal').modal('hide');
+    currentStep = 0;
+    stepTimeLeft = 30;
+    isPaused = false;
+    totalSteps = exercises[currentExercise].length;
+
+    $('#exerciseSessionModal').modal('show');
+    updateExerciseStep();
+    startStepTimer();
+}
+
+function startAnimatedExercise(exerciseType) {
+    alert('Starting animated exercise: ' + exerciseType);
+    console.log('Starting animated exercise:', exerciseType);
+    currentExercise = exerciseType;
+    currentStep = 0;
+    stepTimeLeft = 30;
+    isPaused = false;
+    totalSteps = exercises[currentExercise].length;
+
+    $('#animatedExerciseSection').css('display', 'block');
+    updateExerciseStep();
+    startStepTimer();
+
+    // Scroll to the animated section
+    setTimeout(() => {
+        $('html, body').animate({
+            scrollTop: $('#animatedExerciseSection').offset().top - 100
+        }, 1000);
+    }, 100);
+}
+
+function updateExerciseStep() {
+    const step = exercises[currentExercise][currentStep];
+    const stepElement = $('.exercise-step');
+
+    // Reset animation classes
+    stepElement.removeClass('fade-in animate');
+
+    // Start fade out
+    stepElement.addClass('fade-in');
+
+    setTimeout(() => {
+        // Update content while faded out
+        $('#stepTitle').text(`Step ${currentStep + 1}: ${step.title}`);
+        $('#stepDescription').text(step.description);
+
+        // Fade in with new content
+        stepElement.addClass('animate');
+
+        // Update progress and controls
+        $('#exerciseProgress').css('width', `${((currentStep + 1) / totalSteps) * 100}%`);
+        $('#prevBtn').prop('disabled', currentStep === 0);
+        $('#nextBtn').html(currentStep === totalSteps - 1 ? 'Finish<i class="fas fa-check ms-2"></i>' : 'Next<i class="fas fa-arrow-right ms-2"></i>');
+    }, 500);
+}
+
+function startStepTimer() {
+    stepTimer = setInterval(() => {
+        if (!isPaused) {
+            stepTimeLeft--;
+            updateTimerDisplay();
+            if (stepTimeLeft <= 0) {
+                nextStep();
+            }
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(stepTimeLeft / 60);
+    const seconds = stepTimeLeft % 60;
+    $('#timerDisplay').text(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+}
+
+function nextStep() {
+    if (currentStep < totalSteps - 1) {
+        currentStep++;
+        stepTimeLeft = 30;
+        updateExerciseStep();
+    } else {
+        endExerciseSession();
+    }
+}
+
+function previousStep() {
+    if (currentStep > 0) {
+        currentStep--;
+        stepTimeLeft = 30;
+        updateExerciseStep();
+    }
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    $('#pauseBtn').html(isPaused ? '<i class="fas fa-play me-2"></i>Resume' : '<i class="fas fa-pause me-2"></i>Pause');
+}
+
+function endExerciseSession() {
+    clearInterval(stepTimer);
+    $('#exerciseSessionModal').modal('hide');
+    $('#animatedExerciseSection').hide();
+    alert('Great job completing your exercise session! How do you feel?');
+}
+
+$('#exerciseModal').on('show.bs.modal', function (event) {
+    const button = $(event.relatedTarget);
+    currentExercise = button.data('exercise');
+
+    const modal = $(this);
+    const modalTitle = modal.find('.modal-title');
+    const modalBody = modal.find('.modal-body p');
+
+    if (currentExercise === 'walking') {
+        modalTitle.text('Start Mindful Walking');
+        modalBody.text('Take a gentle walk while focusing on your breathing and surroundings.');
+    } else if (currentExercise === 'yoga') {
+        modalTitle.text('Start Gentle Yoga');
+        modalBody.text('Practice gentle yoga poses for relaxation and mindfulness.');
+    } else if (currentExercise === 'stretching') {
+        modalTitle.text('Start Stretching Routine');
+        modalBody.text('Perform gentle stretches to release tension and improve flexibility.');
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,401 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div id="memory-puzzle-app">
+                <!-- Game UI will be rendered here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.memory-puzzle-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.stat-badge {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    max-width: 400px;
+    margin: 0 auto 2rem;
+}
+
+.tile {
+    aspect-ratio: 1;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: rotateY(0deg);
+}
+
+.tile:hover {
+    transform: scale(1.05);
+}
+
+.tile.flipped {
+    transform: rotateY(0deg);
+}
+
+.tile.matched {
+    opacity: 0.7;
+    cursor: default;
+}
+
+.tile.matched::after {
+    content: "✓";
+    color: #28a745;
+    font-size: 2rem;
+}
+
+.completion-message {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 1rem;
+    margin-top: 2rem;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.instructions {
+    background: #f8f9fa;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.instructions h5 {
+    color: #495057;
+    margin-bottom: 1rem;
+}
+
+.instructions ul {
+    list-style: none;
+    padding: 0;
+}
+
+.instructions li {
+    padding: 0.25rem 0;
+    color: #6c757d;
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.back-btn {
+    background: #6c757d;
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    margin-left: 1rem;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+</style>
+
+<script>
+class MemoryPuzzleGame {
+    constructor() {
+        this.tiles = [];
+        this.flippedIndices = [];
+        this.moves = 0;
+        this.startTime = null;
+        this.elapsedTime = 0;
+        this.isComplete = false;
+        this.currentStreak = 0;
+        this.isProcessing = false;
+        this.timerInterval = null;
+
+        this.cardColors = [
+            'oklch(0.65 0.20 260)', // Primary blue
+            'oklch(0.70 0.18 300)', // Purple
+            'oklch(0.60 0.15 200)', // Cyan
+            'oklch(0.75 0.20 340)', // Pink
+            'oklch(0.55 0.18 180)', // Teal
+            'oklch(0.68 0.22 280)', // Violet
+            'oklch(0.62 0.16 220)', // Sky
+            'oklch(0.72 0.19 320)', // Magenta
+        ];
+
+        this.init();
+    }
+
+    init() {
+        this.initializeGame();
+        this.render();
+    }
+
+    initializeGame() {
+        const values = [...Array(8)].flatMap((_, i) => [i, i]);
+        const shuffled = values.sort(() => Math.random() - 0.5);
+
+        this.tiles = shuffled.map((value, index) => ({
+            id: index,
+            value,
+            isFlipped: false,
+            isMatched: false,
+        }));
+
+        this.flippedIndices = [];
+        this.moves = 0;
+        this.startTime = null;
+        this.elapsedTime = 0;
+        this.isComplete = false;
+        this.isProcessing = false;
+
+        this.clearTimer();
+    }
+
+    startTimer() {
+        if (!this.startTime) {
+            this.startTime = Date.now();
+            this.timerInterval = setInterval(() => {
+                if (!this.isComplete) {
+                    this.elapsedTime = Math.floor((Date.now() - this.startTime) / 1000);
+                    this.updateStats();
+                }
+            }, 1000);
+        }
+    }
+
+    clearTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    }
+
+    handleTileClick(index) {
+        if (this.isProcessing || this.isComplete) return;
+
+        const tile = this.tiles[index];
+        if (tile.isFlipped || tile.isMatched) return;
+
+        this.startTimer();
+
+        const newFlippedIndices = [...this.flippedIndices, index];
+        this.flippedIndices = newFlippedIndices;
+
+        this.tiles[index].isFlipped = true;
+        this.render();
+
+        if (newFlippedIndices.length === 2) {
+            this.isProcessing = true;
+            this.moves++;
+
+            setTimeout(() => {
+                const [firstIndex, secondIndex] = newFlippedIndices;
+                const firstTile = this.tiles[firstIndex];
+                const secondTile = this.tiles[secondIndex];
+
+                if (firstTile.value === secondTile.value) {
+                    // Match found
+                    this.tiles[firstIndex].isMatched = true;
+                    this.tiles[secondIndex].isMatched = true;
+                    this.currentStreak++;
+                    this.flippedIndices = [];
+                    this.isProcessing = false;
+
+                    // Check if game is complete
+                    if (this.tiles.every(t => t.isMatched)) {
+                        this.isComplete = true;
+                        this.clearTimer();
+                        this.showCompletionMessage();
+                    }
+                } else {
+                    // No match
+                    this.tiles[firstIndex].isFlipped = false;
+                    this.tiles[secondIndex].isFlipped = false;
+                    this.flippedIndices = [];
+                    this.currentStreak = 0;
+                    this.isProcessing = false;
+                }
+                this.render();
+            }, this.tiles[newFlippedIndices[0]].value === this.tiles[newFlippedIndices[1]].value ? 600 : 1000);
+        }
+    }
+
+    showCompletionMessage() {
+        const messages = [
+            "Great focus! You've trained your mind well today.",
+            "Excellent memory work! Your concentration is impressive.",
+            "Well done! You're building stronger mental pathways.",
+            "Amazing! Your mindfulness practice is paying off.",
+        ];
+        const message = messages[Math.floor(Math.random() * messages.length)];
+
+        // Show toast notification
+        this.showToast(message, 'success');
+    }
+
+    showToast(message, type = 'info') {
+        // Simple toast implementation
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'info'} position-fixed`;
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
+        toast.innerHTML = `
+            <strong>${type === 'success' ? 'Congratulations!' : 'Info'}</strong> ${message}
+            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
+
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    updateStats() {
+        const timeEl = document.getElementById('elapsed-time');
+        const movesEl = document.getElementById('moves-count');
+        const streakEl = document.getElementById('current-streak');
+
+        if (timeEl) timeEl.textContent = this.formatTime(this.elapsedTime);
+        if (movesEl) movesEl.textContent = this.moves;
+        if (streakEl) {
+            streakEl.textContent = this.currentStreak > 0 ? `🔥 ${this.currentStreak}` : '';
+            streakEl.style.display = this.currentStreak > 0 ? 'block' : 'none';
+        }
+    }
+
+    render() {
+        const app = document.getElementById('memory-puzzle-app');
+        app.innerHTML = `
+            <div class="memory-puzzle-container">
+                <div class="game-header">
+                    <h1><i class="fas fa-brain text-primary"></i> Memory Puzzle</h1>
+                    <p class="text-muted">Match pairs of colored tiles to complete the puzzle</p>
+                    <button class="reset-btn" onclick="game.resetGame()">
+                        <i class="fas fa-redo"></i> New Game
+                    </button>
+                    <a href="{% url 'games' %}" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Games
+                    </a>
+                </div>
+
+                <div class="stats-bar">
+                    <div class="stat-badge">
+                        <i class="fas fa-clock"></i>
+                        <span id="elapsed-time">${this.formatTime(this.elapsedTime)}</span>
+                    </div>
+                    <div class="stat-badge">
+                        <i class="fas fa-mouse-pointer"></i>
+                        <span id="moves-count">${this.moves}</span> moves
+                    </div>
+                    <div class="stat-badge" id="current-streak" style="display: ${this.currentStreak > 0 ? 'block' : 'none'}; background: #fff3cd; border-color: #ffeaa7;">
+                        🔥 ${this.currentStreak}
+                    </div>
+                </div>
+
+                <div class="game-board">
+                    ${this.tiles.map((tile, index) => `
+                        <div
+                            class="tile ${tile.isFlipped || tile.isMatched ? 'flipped' : ''} ${tile.isMatched ? 'matched' : ''}"
+                            style="background-color: ${tile.isFlipped || tile.isMatched ? this.cardColors[tile.value] : 'oklch(0.92 0.02 250)'};"
+                            onclick="game.handleTileClick(${index})"
+                            ${this.isProcessing || tile.isMatched || tile.isFlipped ? 'style="pointer-events: none;"' : ''}
+                        >
+                        </div>
+                    `).join('')}
+                </div>
+
+                ${this.isComplete ? `
+                    <div class="completion-message">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+                        <h3>Puzzle Complete!</h3>
+                        <p>${this.formatTime(this.elapsedTime)} • ${this.moves} moves</p>
+                        <p class="mb-0">Great focus! You've trained your mind well today.</p>
+                    </div>
+                ` : ''}
+
+                <div class="instructions">
+                    <h5><i class="fas fa-info-circle"></i> How to Play</h5>
+                    <ul>
+                        <li>• Click on tiles to reveal their colors</li>
+                        <li>• Find matching pairs of colors</li>
+                        <li>• Complete the puzzle in as few moves as possible</li>
+                        <li>• Build streaks by matching consecutive pairs</li>
+                        <li>• Take your time and focus on the patterns</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+    }
+
+    resetGame() {
+        this.initializeGame();
+        this.render();
+    }
+}
+
+// Initialize game when DOM is loaded
+let game;
+document.addEventListener('DOMContentLoaded', () => {
+    game = new MemoryPuzzleGame();
+});
+</script>
+{% endblock %}

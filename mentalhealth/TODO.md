@@ -1,14 +1,19 @@
-# TODO: Add Animated Exercise Feature to exercise.html
+# UI Consistency Update
 
-## Overview
-Implement animated, guided exercise sessions for Mindful Walking, Gentle Yoga, and Stretching Routine with step-by-step instructions, timers, progress tracking, and CSS animations.
+## Completed Tasks
+- [x] Updated base.html with common styles (body gradient, card styles, gradient-title, etc.)
+- [x] Removed redundant styles from dashboard.html
+- [x] Removed redundant styles from admin_dashboard.html
+- [x] Updated login.html to use card layout instead of hero section
+- [x] Updated signup.html to use card layout instead of hero section
+- [x] Updated articles.html to use consistent card layout and removed custom styles
+- [x] Added stat-icon, stat-number, stat-label styles to base.html for articles page
+- [x] Added "Read Articles" button to dashboard Quick Actions for better visibility
 
-## Steps
-- [x] Define exercise data structures in JavaScript (steps for each exercise)
-- [x] Add CSS styles for fade-in animations and progress bar
-- [ ] Create guided exercise modal/session UI (replace current alert)
-- [ ] Implement JavaScript timer functionality (30s per step, auto-progress)
-- [ ] Add manual controls (next, previous, pause/resume)
-- [ ] Add progress bar and countdown timer display
-- [ ] Handle session completion and feedback
-- [x] Test the implementation for all three exercises
+## Summary
+The entire project UI is now consistent with the dashboard and admin dashboard styles:
+- Unified gradient background
+- Consistent card styling with backdrop blur
+- Gradient titles
+- Hover effects on buttons
+- Standardized layouts using container-fluid and cards

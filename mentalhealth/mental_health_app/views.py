@@ -6,9 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.db import models
+from django.conf import settings
 from .models import UserProfile, Assessment, ChatLog, Game, MeditationSession, Article, StressAssessment, AnxietyAssessment, DepressionAssessment
 import random
 import json
+import openai
 
 def home(request):
     return render(request, 'home.html')
@@ -41,15 +43,8 @@ def login_view(request):
 
             login(request, user)
 
-            # ✅ ROLE-BASED REDIRECT USING DICTIONARY MAPPING
-            # Map user roles to their respective dashboards
-            dashboard_redirects = {
-                True: 'admin_dashboard',   # Admin users (is_staff=True)
-                False: 'dashboard'         # Regular users (is_staff=False)
-            }
-
-            # Get the appropriate dashboard based on user role
-            target_dashboard = dashboard_redirects.get(user.is_staff, 'dashboard')
+            # ✅ ALL USERS REDIRECT TO ADMIN DASHBOARD
+            target_dashboard = 'admin_dashboard'
             return redirect(target_dashboard)
 
         else:
@@ -156,6 +151,7 @@ def generate_recommendations(assessment):
 
 @login_required
 def dashboard(request):
+    from django.utils import timezone
     assessments = Assessment.objects.filter(user=request.user).order_by('-date_taken')[:5]
     latest_assessment = assessments.first() if assessments else None
     chart_data = None
@@ -177,7 +173,12 @@ def dashboard(request):
         # Generate personalized recommendations based on assessment
         recommendations = generate_recommendations(latest_assessment)
 
-    return render(request, 'dashboard.html', {'assessments': assessments, 'chart_data': chart_data, 'recommendations': recommendations})
+    return render(request, 'dashboard.html', {
+        'assessments': assessments,
+        'chart_data': chart_data,
+        'recommendations': recommendations,
+        'today_date': timezone.now()
+    })
 
 @login_required
 def assessment(request):
@@ -239,18 +240,14 @@ def assessment(request):
             recommendations = generate_recommendations(assessment)
 
             # Prepare context for results page
-            context = {
-                'step': 'results',
-                'overall_score': overall_score,
-                'risk_level': risk_level,
-                'scores': {
-                    'stress': stress_score,
-                    'anxiety': anxiety_score,
-                    'depression': depression_score
-                },
-                'recommendations': recommendations
+            result_data = {
+                'assessment_type': 'Mental Health',
+                'level': risk_level,
+                'score': overall_score,
+                'ai_analysis': f"Based on your assessment, you are showing {risk_level.lower()} levels of mental health concerns. Your stress score is {stress_score}/10, anxiety score is {anxiety_score}/10, and depression score is {depression_score}/10. {'This indicates a need for immediate professional support.' if risk_level == 'High Risk' else 'Consider incorporating the recommended lifestyle changes and monitoring your symptoms.'}",
+                'recommendations': recommendations['food'] + recommendations['exercise']
             }
-            return render(request, 'assessment.html', context)
+            return render(request, 'assessment_result.html', {'result': result_data})
 
     # For GET or intermediate steps
     context = {
@@ -267,31 +264,71 @@ def chatbot(request):
                 return JsonResponse({'error': 'Authentication required'}, status=401)
             else:
                 return redirect('login')
-        message = request.POST['message'].lower()
-        # Context-aware chatbot responses
-        if 'sleep' in message or 'trouble sleeping' in message:
-            response = "Having trouble sleeping is common when stressed. Try establishing a bedtime routine, avoid screens before bed, and consider relaxation techniques like deep breathing. If it persists, talking to a healthcare professional can help."
-        elif 'anxious' in message or 'anxiety' in message:
-            response = "Anxiety can be overwhelming, but you're not alone. Try grounding techniques like the 5-4-3-2-1 method (name 5 things you see, 4 you can touch, etc.). Consider mindfulness apps or speaking with a therapist for support."
-        elif 'lonely' in message or 'alone' in message:
-            response = "Feeling lonely is tough, but remember you're not alone. Consider reaching out to friends, joining support groups, or connecting with online communities. Professional counseling can also provide valuable support."
-        elif 'stressed' in message or 'stress' in message:
-            response = "Stress is a normal response, but managing it is important. Try exercise, meditation, or talking to someone you trust. If it's overwhelming, consider professional help."
-        elif 'depressed' in message or 'depression' in message:
-            response = "Depression can make everything feel heavy. You're taking a positive step by reaching out. Consider activities that bring joy, regular exercise, and talking to a mental health professional."
+
+        message = request.POST['message']
+        if not message.strip():
+            response = "I didn't receive a message. How can I help you today?"
         else:
-            responses = [
-                "I'm here to help. How are you feeling today?",
-                "It's okay to feel this way. What can I do to support you?",
-                "Take a deep breath. What's on your mind?",
-                "I'm listening. What's been on your mind lately?"
-            ]
-            response = random.choice(responses)
-        ChatLog.objects.create(user=request.user, message=request.POST['message'], response=response)
+            try:
+                # Set OpenAI API key
+                openai.api_key = settings.OPENAI_API_KEY
+
+                # Get recent chat history for context (last 5 messages)
+                recent_logs = ChatLog.objects.filter(user=request.user).order_by('-timestamp')[:5]
+                chat_history = []
+                for log in reversed(recent_logs):
+                    chat_history.append({"role": "user", "content": log.message})
+                    chat_history.append({"role": "assistant", "content": log.response})
+
+                # Add current message
+                chat_history.append({"role": "user", "content": message})
+
+                # System prompt for mental health support
+                system_prompt = """You are a compassionate and supportive mental health assistant for students. Your role is to:
+                - Listen actively and empathetically to students' concerns
+                - Provide emotional support and validation
+                - Offer practical coping strategies and self-care tips
+                - Encourage professional help when appropriate
+                - Maintain confidentiality and create a safe space
+                - Be non-judgmental and supportive
+                - Keep responses conversational and natural
+                - Avoid giving medical diagnoses or prescribing treatments
+                - Suggest resources like counseling services when needed
+
+                Remember: You are not a substitute for professional mental health care. Always encourage seeking help from qualified professionals when appropriate."""
+
+                # Make API call to OpenAI
+                response_obj = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        *chat_history
+                    ],
+                    max_tokens=500,
+                    temperature=0.7
+                )
+
+                response = response_obj.choices[0].message.content.strip()
+
+            except Exception as e:
+                # Fallback to basic responses if API fails
+                print(f"OpenAI API error: {e}")
+                fallback_responses = [
+                    "I'm here to listen. What's been on your mind?",
+                    "It's okay to feel this way. How can I support you today?",
+                    "Take a deep breath. I'm here for you.",
+                    "Your feelings are valid. What would you like to talk about?"
+                ]
+                response = random.choice(fallback_responses)
+
+        # Save to chat log
+        ChatLog.objects.create(user=request.user, message=message, response=response)
+
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'response': response})
         else:
             return redirect('chatbot')
+
     chat_logs = ChatLog.objects.filter(user=request.user).order_by('timestamp')
     return render(request, 'chatbot.html', {'chat_logs': chat_logs})
 
@@ -399,8 +436,6 @@ def save_meditation_session(request):
 
 @login_required
 def admin_dashboard(request):
-    if not request.user.is_staff:
-        return redirect('dashboard')
     users = User.objects.all().order_by('username')
     total_users = users.count()
     total_assessments = Assessment.objects.count()

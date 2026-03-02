@@ -12,62 +12,162 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
+            background: linear-gradient(to bottom right, #f3e8ff, #fce7f3, #fef3c7);
+            min-height: 100vh;
+            margin: 0;
             font-family: 'Poppins', sans-serif;
+        }
+
+        /* Custom navbar styles */
+        .text-gray-700 {
+            color: #374151;
+        }
+
+        .text-cyan-500 {
+            color: #06b6d4;
+        }
+
+        .hover-text-cyan-600:hover {
+            color: #0891b2 !important;
+        }
+
+        .hover-text-red-600:hover {
+            color: #dc2626 !important;
+        }
+
+        .transition {
+            transition: all 0.15s ease-in-out;
+        }
+
+        .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .sticky-top {
+            position: sticky;
+            top: 0;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: none;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .gradient-title {
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .badge {
+            font-size: 0.8em;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 123, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: #007bff;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #6c757d;
         }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">Mind Care</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-md sticky-top" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 50;" data-testid="navbar">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center" href="{% if user.is_authenticated %}{% if user.is_staff %}{% url 'admin_dashboard' %}{% else %}{% url 'dashboard' %}{% endif %}{% else %}{% url 'home' %}{% endif %}" data-testid="nav-logo">
+                <i class="fas fa-heart text-cyan-500 me-2" style="font-size: 2rem;"></i>
+                <span class="fw-bold fs-4" style="background: linear-gradient(135deg, #0891b2, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">MindCare</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
-                    </li>
+                <div class="navbar-nav ms-auto d-flex align-items-center">
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'assessment' %}">Assessment</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'chatbot' %}">Chatbot</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'games' %}">Games</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'exercise' %}">Exercise</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'articles' %}">Articles</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'profile' %}">Profile</a>
-                        </li>
-                    {% endif %}
-                </ul>
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                        </li>
+                        <a class="nav-link d-flex align-items-center me-4 text-gray-700 hover-text-cyan-600 transition" href="{% url 'dashboard' %}" data-testid="nav-dashboard">
+                            <i class="fas fa-home me-1"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        {% if not user.is_staff %}
+                            <a class="nav-link d-flex align-items-center me-4 text-gray-700 hover-text-cyan-600 transition" href="{% url 'articles' %}" data-testid="nav-articles">
+                                <i class="fas fa-book-open me-1"></i>
+                                <span>Articles</span>
+                            </a>
+                            <a class="nav-link d-flex align-items-center me-4 text-gray-700 hover-text-cyan-600 transition" href="{% url 'chatbot' %}" data-testid="nav-chatbot">
+                                <i class="fas fa-comments me-1"></i>
+                                <span>Chat</span>
+                            </a>
+                            <a class="nav-link d-flex align-items-center me-4 text-gray-700 hover-text-cyan-600 transition" href="{% url 'games' %}" data-testid="nav-activities">
+                                <i class="fas fa-gamepad me-1"></i>
+                                <span>Activities</span>
+                            </a>
+                            <a class="nav-link d-flex align-items-center me-4 text-gray-700 hover-text-cyan-600 transition" href="{% url 'profile' %}" data-testid="nav-profile">
+                                <i class="fas fa-user me-1"></i>
+                                <span>Profile</span>
+                            </a>
+                        {% endif %}
+                        <button class="btn btn-link nav-link d-flex align-items-center text-gray-700 hover-text-red-600 transition border-0 bg-transparent" onclick="window.location.href='{% url 'logout' %}'" data-testid="nav-logout-btn">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            <span>Logout</span>
+                        </button>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'signup' %}">Signup</a>
-                        </li>
+                        <a class="nav-link me-4 text-gray-700 hover-text-cyan-600 transition" href="{% url 'login' %}">Login</a>
+                        <a class="nav-link text-gray-700 hover-text-cyan-600 transition" href="{% url 'signup' %}">Signup</a>
                     {% endif %}
-                </ul>
+                </div>
             </div>
         </div>
     </nav>

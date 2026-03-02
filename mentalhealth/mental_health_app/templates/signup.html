@@ -1,34 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="hero-content">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-6">
-                    <div class="text-center mb-5">
-                        <h1 class="display-4 fw-bold text-white mb-3">{% if is_admin %}Join as Admin{% else %}Join Students Care{% endif %}</h1>
-                        <p class="lead text-white-50">{% if is_admin %}Create your admin account{% else %}Start your journey towards better mental health today{% endif %}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Signup Form -->
-<div class="container mt-5">
+<div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-lg border-0 fade-in">
-                <div class="card-body p-5">
+            <div class="card">
+                <div class="card-body">
                     <div class="text-center mb-4">
-                        <div class="feature-icon mx-auto mb-3">
-                            <i class="fas fa-user-plus text-white"></i>
-                        </div>
-                        <h2 class="card-title fw-bold text-primary mb-2">Create Your Account</h2>
-                        <p class="text-muted">Join thousands of students taking care of their mental health</p>
+                        <h2 class="gradient-title">{% if is_admin %}Join as Admin{% else %}Join Students Care{% endif %}</h2>
+                        <p class="text-muted">{% if is_admin %}Create your admin account{% else %}Start your journey towards better mental health today{% endif %}</p>
                     </div>
 
                     {% if messages %}

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}About - Mind Care{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="gradient-title">About Mind Care</h1>
+                <p class="lead text-muted">Your Mental Wellness Journey Starts Here</p>
+            </div>
+
+            <!-- Main Content Card -->
+            <div class="card shadow-lg mb-5">
+                <div class="card-body p-5">
+                    <h2 class="text-primary mb-4">Welcome to Mind Care</h2>
+                    <p class="mb-4">
+                        Mind Care is a comprehensive mental health support system designed specifically for students. 
+                        We understand the unique challenges that students face in their academic journey, and we're 
+                        here to provide the support and resources you need to maintain your mental well-being.
+                    </p>
+                    
+                    <hr class="my-4">
+                    
+                    <h3 class="text-purple mb-3">Our Mission</h3>
+                    <p class="mb-4">
+                        To provide accessible, confidential, and effective mental health support to students 
+                        through innovative technology and compassionate care. We believe that every student 
+                        deserves access to quality mental health resources.
+                    </p>
+
+                    <hr class="my-4">
+
+                    <h3 class="text-purple mb-3">What We Offer</h3>
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="feature-icon-small me-3">
+                                    <i class="fas fa-brain fa-2x text-cyan-500"></i>
+                                </div>
+                                <div>
+                                    <h5>Mental Health Assessments</h5>
+                                    <p class="text-muted mb-0">Take validated assessments for stress, anxiety, and depression. Get instant results with personalized recommendations.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="feature-icon-small me-3">
+                                    <i class="fas fa-comments fa-2x text-purple-500"></i>
+                                </div>
+                                <div>
+                                    <h5>AI Counselor Chat</h5>
+                                    <p class="text-muted mb-0">Talk to our empathetic AI counselor anytime, anywhere. Get support, guidance, and coping strategies 24/7.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="feature-icon-small me-3">
+                                    <i class="fas fa-book-open fa-2x text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <h5>Educational Resources</h5>
+                                    <p class="text-muted mb-0">Access a library of articles on mental health topics, coping strategies, and wellness tips.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="feature-icon-small me-3">
+                                    <i class="fas fa-gamepad fa-2x text-green-500"></i>
+                                </div>
+                                <div>
+                                    <h5>Relaxation Activities</h5>
+                                    <p class="text-muted mb-0">Try breathing exercises, meditation, and fun games to calm your mind and reduce stress.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h3 class="text-purple mb-3">Why Choose Mind Care?</h3>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="text-center p-3">
+                                <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                                <h5>Private & Secure</h5>
+                                <p class="text-muted mb-0">Your data is encrypted and kept completely confidential.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3">
+                                <i class="fas fa-clock fa-3x text-info mb-3"></i>
+                                <h5>24/7 Availability</h5>
+                                <p class="text-muted mb-0">Access support anytime, anywhere you need it.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3">
+                                <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                                <h5>Non-Judgmental</h5>
+                                <p class="text-muted mb-0">A safe space where your feelings are validated.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h3 class="text-purple mb-3">Get Started</h3>
+                    <p class="mb-4">
+                        Ready to take control of your mental health? Sign up today and start your wellness journey. 
+                        It's free, confidential, and only takes a minute to create an account.
+                    </p>
+                    
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Sign Up Now
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Card -->
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <h3 class="text-purple mb-3">Need Immediate Help?</h3>
+                    <p class="mb-3">
+                        If you're in crisis or need immediate assistance, please reach out to professional resources:
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><i class="fas fa-phone text-success me-2"></i><strong>National Suicide Prevention:</strong> 988 (US)</p>
+                            <p class="mb-2"><i class="fas fa-phone text-success me-2"></i><strong>Crisis Text Line:</strong> Text HOME to 741741</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><i class="fas fa-envelope text-info me-2"></i><strong>Emergency Services:</strong> 911</p>
+                            <p class="mb-0"><i class="fas fa-hospital text-danger me-2"></i><strong>Nearest ER:</strong> Call 911</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .gradient-title {
+        background: linear-gradient(135deg, #7c3aed, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+    }
+    
+    .text-purple {
+        color: #7c3aed;
+    }
+    
+    .feature-icon-small {
+        min-width: 50px;
+        text-align: center;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 1rem;
+    }
+</style>
+{% endblock %}
+

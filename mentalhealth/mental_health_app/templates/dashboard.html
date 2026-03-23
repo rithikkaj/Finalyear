@@ -1,78 +1,150 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard - Mind Care{% endblock %}
+
 {% block content %}
-    <div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 p-4">
-        <div class="container-fluid">
-        <div class="row">
-            <div class="col-12 d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="gradient-title mb-0">Welcome back, {{ user.first_name|default:user.username }}!</h1>
-                    <p class="text-muted mb-0">Here's an overview of your wellness journey</p>
-                </div>
-                <div class="d-flex align-items-center">
-                    <div class="text-end me-3">
-                        <p class="text-muted mb-1">Today's Date</p>
-                        <h5 class="mb-0">{{ today_date|date:"F j, Y" }}</h5>
-                    </div>
-                    <a href="{% url 'logout' %}" class="btn btn-outline-danger">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3 gradient-title">
-                            <i class="fas fa-bolt me-2"></i>Quick Actions
-                        </h5>
-                        <div class="row g-3">
-                            <div class="col-lg-2 col-md-3">
-                                <a href="{% url 'assessment' %}" class="btn btn-success btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
-                                    <i class="fas fa-clipboard-check fa-2x mb-2"></i>
-                                    <span>Take Assessment</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-2 col-md-3">
-                                <a href="{% url 'chatbot' %}" class="btn btn-info btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
-                                    <i class="fas fa-comments fa-2x mb-2"></i>
-                                    <span>Chat Support</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-2 col-md-3">
-                                <a href="{% url 'games' %}" class="btn btn-primary btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
-                                    <i class="fas fa-gamepad fa-2x mb-2"></i>
-                                    <span>Relaxing Games</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-2 col-md-3">
-                                <a href="{% url 'articles' %}" class="btn btn-warning btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
-                                    <i class="fas fa-book-open fa-2x mb-2"></i>
-                                    <span>Read Articles</span>
-                                </a>
-                            </div>
-                            <div class="col-lg-2 col-md-3">
-                                <a href="{% url 'profile' %}" class="btn btn-secondary btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
-                                    <i class="fas fa-user-edit fa-2x mb-2"></i>
-                                    <span>Update Profile</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    <!-- Recent Assessments -->
-    <div class="row">
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 p-4">
+    <div class="container-fluid">
+    
+    <!-- Welcome Message for New Users -->
+    {% if show_welcome %}
+    <div class="row mb-4">
         <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 15px; background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-heart fa-2x me-3"></i>
+                    <div>
+                        <h4 class="alert-heading mb-1">Welcome to Students Care, {{ user.first_name|default:user.username }}!</h4>
+                        <p class="mb-0">We're so glad you're here! Start by taking your first mental health assessment to understand your current well-being.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="gradient-title mb-0">Hello, {{ user.first_name|default:user.username }}!</h1>
+                <p class="text-muted mb-0">Here's your wellness overview</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="text-end me-3">
+                    <p class="text-muted mb-1">Today's Date</p>
+                    <h6 class="mb-0">{{ today_date|date:"F j, Y" }}</h6>
+                </div>
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card h-100 text-center" style="border-radius: 15px;">
+                <div class="card-body">
+                    <div class="stat-icon mx-auto mb-2">
+                        <i class="fas fa-clipboard-check fa-lg text-cyan-500"></i>
+                    </div>
+                    <h4 class="mb-1">{{ assessments.count }}</h4>
+                    <p class="text-muted mb-0 small">Assessments Taken</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center" style="border-radius: 15px;">
+                <div class="card-body">
+                    <div class="stat-icon mx-auto mb-2">
+                        <i class="fas fa-comments fa-lg text-purple-500"></i>
+                    </div>
+                    <h4 class="mb-1">0</h4>
+                    <p class="text-muted mb-0 small">Chat Sessions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center" style="border-radius: 15px;">
+                <div class="card-body">
+                    <div class="stat-icon mx-auto mb-2">
+                        <i class="fas fa-heart fa-lg text-pink-500"></i>
+                    </div>
+                    <h4 class="mb-1">😊 Good</h4>
+                    <p class="text-muted mb-0 small">Your Mood</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center" style="border-radius: 15px;">
+                <div class="card-body">
+                    <div class="stat-icon mx-auto mb-2">
+                        <i class="fas fa-fire fa-lg text-orange-500"></i>
+                    </div>
+                    <h4 class="mb-1">0 Days</h4>
+                    <p class="text-muted mb-0 small">Streak</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="gradient-title mb-3">
+                <i class="fas fa-bolt me-2"></i>Quick Actions
+            </h5>
+        </div>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'assessment' %}" class="btn btn-success btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 text-white" style="border-radius: 15px;">
+                <i class="fas fa-clipboard-check fa-2x mb-2"></i>
+                <span class="small">Assessment</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'chatbot' %}" class="btn btn-info btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 text-white" style="border-radius: 15px;">
+                <i class="fas fa-comments fa-2x mb-2"></i>
+                <span class="small">AI Chat</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'games' %}" class="btn btn-primary btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 text-white" style="border-radius: 15px;">
+                <i class="fas fa-gamepad fa-2x mb-2"></i>
+                <span class="small">Games</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'articles' %}" class="btn btn-warning btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 text-white" style="border-radius: 15px;">
+                <i class="fas fa-book-open fa-2x mb-2"></i>
+                <span class="small">Articles</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'meditation' %}" class="btn btn-teal btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 text-white" style="border-radius: 15px; background: linear-gradient(135deg, #20c997, #1abc9c);">
+                <i class="fas fa-spa fa-2x mb-2"></i>
+                <span class="small">Meditation</span>
+            </a>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <a href="{% url 'profile' %}" class="btn btn-secondary btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 text-white" style="border-radius: 15px;">
+                <i class="fas fa-user-edit fa-2x mb-2"></i>
+                <span class="small">Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row g-4">
+        <!-- Recent Assessments -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm" style="border-radius: 15px;">
+                <div class="card-header bg-light border-0" style="border-radius: 15px 15px 0 0;">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-history text-primary me-2"></i>Recent Assessments
+                        <i class="fas fa-chart-line me-2"></i>Recent Assessments
                     </h5>
                 </div>
                 <div class="card-body">
@@ -82,56 +154,39 @@
                                 <thead>
                                     <tr>
                                         <th>Date</th>
-                                        <th>Stress Level</th>
-                                        <th>Anxiety Level</th>
-                                        <th>Depression Level</th>
+                                        <th><i class="fas fa-brain me-1"></i> Stress</th>
+                                        <th><i class="fas fa-heart me-1"></i> Anxiety</th>
+                                        <th><i class="fas fa-cloud me-1"></i> Depression</th>
                                         <th>Risk Level</th>
-                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for assessment in assessments %}
                                     <tr>
                                         <td>{{ assessment.date_taken|date:"M j, Y" }}</td>
-                                        <td>
-                                            <span class="badge bg-warning">{{ assessment.stress_level }}/10</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info">{{ assessment.anxiety_level }}/10</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-danger">{{ assessment.depression_level }}/10</span>
-                                        </td>
+                                        <td><span class="badge bg-warning">{{ assessment.stress_score }}/20</span></td>
+                                        <td><span class="badge bg-info">{{ assessment.anxiety_score }}/20</span></td>
+                                        <td><span class="badge bg-danger">{{ assessment.depression_score }}/20</span></td>
                                         <td>
                                             {% if assessment.prediction == 'Low Risk' %}
-                                                <span class="badge bg-success">Low Risk</span>
+                                                <span class="badge bg-success"><i class="fas fa-check"></i> Low Risk</span>
                                             {% elif assessment.prediction == 'Moderate Risk' %}
-                                                <span class="badge bg-warning">Moderate Risk</span>
+                                                <span class="badge bg-warning"><i class="fas fa-exclamation"></i> Moderate Risk</span>
                                             {% else %}
-                                                <span class="badge bg-danger">High Risk</span>
+                                                <span class="badge bg-danger"><i class="fas fa-times"></i> High Risk</span>
                                             {% endif %}
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" onclick="viewAssessment({{ assessment.id }})">
-                                                <i class="fas fa-eye"></i> View
-                                            </button>
                                         </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
-                        <div class="text-center mt-3">
-                            <a href="{% url 'assessment' %}" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>Take New Assessment
-                            </a>
-                        </div>
                     {% else %}
                         <div class="text-center py-5">
                             <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">No assessments yet</h5>
-                            <p class="text-muted">Start your mental health journey by taking your first assessment.</p>
-                            <a href="{% url 'assessment' %}" class="btn btn-success btn-lg">
+                            <p class="text-muted">Start your mental health journey!</p>
+                            <a href="{% url 'assessment' %}" class="btn btn-success">
                                 <i class="fas fa-play me-2"></i>Take Your First Assessment
                             </a>
                         </div>
@@ -139,97 +194,42 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Assessment Visualization -->
-    {% if chart_data %}
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
+        <!-- Daily Tips -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm" style="border-radius: 15px;">
+                <div class="card-header bg-light border-0" style="border-radius: 15px 15px 0 0;">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-chart-pie text-primary me-2"></i>Latest Assessment Breakdown
+                        <i class="fas fa-lightbulb me-2"></i>Daily Wellness Tip
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <canvas id="assessmentChart" width="300" height="150"></canvas>
-                        </div>
-                        <div class="col-md-6 d-flex align-items-center">
-                            <div>
-                                <h6>Risk Prediction: <span class="badge {% if chart_data.prediction == 'Low Risk' %}bg-success{% elif chart_data.prediction == 'Moderate Risk' %}bg-warning{% else %}bg-danger{% endif %}">{{ chart_data.prediction }}</span></h6>
-                                <p class="text-muted mt-3">This pie chart shows the contribution of various factors to your mental health assessment. Higher values indicate areas that may need more attention.</p>
-                                <ul class="list-unstyled">
-                                    <li><strong>Stress/Anxiety/Depression:</strong> Your self-reported levels (1-10)</li>
-                                    <li><strong>Work Hours:</strong> Normalized from hours worked per week</li>
-                                    <li><strong>Sleep Hours:</strong> Impact of sleep on mental health</li>
-                                    <li><strong>Ranges:</strong> Severity of anxiety and depression symptoms</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Personalized Recommendations -->
-    {% if recommendations %}
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-utensils me-2"></i>Personalized Recommendations
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-success">
-                                <i class="fas fa-apple-alt me-2"></i>Food Recommendations
-                            </h6>
-                            <ul class="list-group list-group-flush">
-                                {% for rec in recommendations.food %}
-                                <li class="list-group-item border-0 px-0">
-                                    <i class="fas fa-check-circle text-success me-2"></i>{{ rec }}
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-primary">
-                                <i class="fas fa-running me-2"></i>Exercise Recommendations
-                            </h6>
-                            <ul class="list-group list-group-flush">
-                                {% for rec in recommendations.exercise %}
-                                <li class="list-group-item border-0 px-0">
-                                    <i class="fas fa-check-circle text-primary me-2"></i>{{ rec }}
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Wellness Tips -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm bg-light">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fas fa-lightbulb text-warning me-2"></i>Daily Wellness Tip
-                    </h5>
-                    <div class="alert alert-info" role="alert">
+                    <div class="alert alert-info mb-0" role="alert">
                         <i class="fas fa-quote-left me-2"></i>
-                        Remember to take deep breaths throughout the day. Even just 5 minutes of mindful breathing can help reduce stress and improve your mental clarity.
+                        {{ quote|default:"Remember to take deep breaths throughout the day. Even just 5 minutes of mindful breathing can help reduce stress." }}
                         <i class="fas fa-quote-right ms-2"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card shadow-sm mt-3" style="border-radius: 15px;">
+                <div class="card-header bg-light border-0" style="border-radius: 15px 15px 0 0;">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-link me-2"></i>Quick Links
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'breathing' %}" class="btn btn-outline-primary btn-sm">
+                            🌬️ Breathing Exercises
+                        </a>
+                        <a href="{% url 'exercise' %}" class="btn btn-outline-success btn-sm">
+                            🏃 Exercise Tips
+                        </a>
+                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-sm">
+                            ⚙️ Update Profile
+                        </a>
                     </div>
                 </div>
             </div>
@@ -238,85 +238,59 @@
 </div>
 
 <style>
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    transition: all 0.3s ease;
-}
-
-.card {
-    border: none;
-    border-radius: 15px;
-}
-
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-}
-
-.badge {
-    font-size: 0.8em;
-}
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .badge {
+        font-size: 0.8em;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(0, 123, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .gradient-title {
+        background: linear-gradient(135deg, #7c3aed, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+    }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-function viewAssessment(assessmentId) {
-    // Placeholder for viewing assessment details
-    alert('Assessment details view coming soon! Assessment ID: ' + assessmentId);
-}
-
-// Add some interactive elements
 document.addEventListener('DOMContentLoaded', function() {
-    // Animate cards on load
     const cards = document.querySelectorAll('.card');
     cards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(20px)';
         setTimeout(() => {
-            card.style.transition = 'all 0.6s ease';
+            card.style.transition = 'all 0.5s ease';
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
         }, index * 100);
     });
-
-    // Render pie chart if data exists
-    {% if chart_data %}
-    const ctx = document.getElementById('assessmentChart').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: {{ chart_data.labels|safe }},
-            datasets: [{
-                data: {{ chart_data.data|safe }},
-                backgroundColor: [
-                    '#FF6384', // Stress
-                    '#36A2EB', // Anxiety
-                    '#FFCE56'  // Depression
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.parsed + '/10';
-                        }
-                    }
-                }
-            }
-        }
-    });
-    {% endif %}
 });
 </script>
 {% endblock %}
-</body>
-</html>
+

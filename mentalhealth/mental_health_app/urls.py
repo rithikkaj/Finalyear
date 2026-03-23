@@ -3,13 +3,15 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('login/', views.login_choice, name='login'),
+    path('about/', views.about, name='about'),
+    path('login/', views.login_view, name='login'),  # Alias for user_login
     path('user_login/', views.login_view, name='user_login'),
     path('signup/', views.signup_view, name='signup'),
     path('user_signup/', views.signup_view, name='user_signup'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('assessment/', views.assessment, name='assessment'),
     path('chatbot/', views.chatbot, name='chatbot'),
+    path('chatbot-response/', views.chatbot_response, name='chatbot_response'),
     path('profile/', views.profile, name='profile'),
     path('games/', views.games, name='games'),
     path('exercise/', views.exercise, name='exercise'),

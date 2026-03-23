@@ -237,14 +237,27 @@
 </style>
 
 <script>
+console.log('Chatbot script loaded');
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded');
+    
     // Auto-scroll to bottom of chat
     const chatContainer = document.getElementById('chatContainer');
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        console.log('Chat container found');
+    } else {
+        console.error('Chat container not found!');
+    }
 
     // Handle suggestion buttons
-    document.querySelectorAll('.suggestion-btn').forEach(button => {
+    const suggestionButtons = document.querySelectorAll('.suggestion-btn');
+    console.log('Found suggestion buttons:', suggestionButtons.length);
+    
+    suggestionButtons.forEach(button => {
         button.addEventListener('click', function() {
+            console.log('Suggestion button clicked');
             const message = this.getAttribute('data-message');
             document.getElementById('messageInput').value = message;
             document.getElementById('messageInput').focus();
@@ -253,58 +266,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Auto-resize textarea
     const messageInput = document.getElementById('messageInput');
-    messageInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
+    if (messageInput) {
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
 
     // Handle form submission with AJAX
-    document.getElementById('chatForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const messageInput = document.getElementById('messageInput');
-        const message = messageInput.value.trim();
-        if (!message) return;
+    const chatForm = document.getElementById('chatForm');
+    if (chatForm) {
+        console.log('Chat form found');
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitted');
+            
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            if (!message) return;
 
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalHtml = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        submitBtn.disabled = true;
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalHtml = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            submitBtn.disabled = true;
 
-        // Append user message
-        appendMessage('user', message);
+            // Append user message
+            appendMessage('user', message);
 
-        // Clear input
-        messageInput.value = '';
+            // Clear input
+            messageInput.value = '';
 
-        // Send AJAX request
-        fetch(window.location.href, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: new URLSearchParams({
-                'message': message
+            // Send AJAX request
+            fetch("{% url 'chatbot_response' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    'message': message
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Append bot response
-            appendMessage('bot', data.response);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            appendMessage('bot', 'Sorry, there was an error processing your message.');
-        })
-        .finally(() => {
-            submitBtn.innerHTML = originalHtml;
-            submitBtn.disabled = false;
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                appendMessage('bot', data.response);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                appendMessage('bot', 'Sorry, there was an error: ' + error.message);
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalHtml;
+                submitBtn.disabled = false;
+            });
         });
-    });
-
+    } else {
+        console.error('Chat form not found!');
+    }
+    
     // Function to append messages
     function appendMessage(type, text) {
+        console.log('Appending message:', type, text);
         const chatContainer = document.getElementById('chatContainer');
 
         // Clear welcome message if it exists
@@ -339,28 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         chatContainer.appendChild(messageDiv);
         chatContainer.scrollTop = chatContainer.scrollHeight;
-
-        // Add fade-in animation
-        messageDiv.style.opacity = '0';
-        messageDiv.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            messageDiv.style.transition = 'all 0.5s ease';
-            messageDiv.style.opacity = '1';
-            messageDiv.style.transform = 'translateY(0)';
-        }, 100);
     }
-
-    // Add fade-in animation for messages
-    const messages = document.querySelectorAll('.message');
-    messages.forEach((message, index) => {
-        message.style.opacity = '0';
-        message.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            message.style.transition = 'all 0.5s ease';
-            message.style.opacity = '1';
-            message.style.transform = 'translateY(0)';
-        }, index * 100);
-    });
 });
 </script>
 {% endblock %}

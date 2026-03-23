@@ -10,6 +10,7 @@ class UserProfile(models.Model):
     email_reminders = models.BooleanField(default=False)
     sms_reminders = models.BooleanField(default=False)
     reminder_time = models.TimeField(null=True, blank=True)  # Preferred time for reminders
+    is_first_login = models.BooleanField(default=True)  # Track first-time login for welcome message
 
     def __str__(self):
         return self.user.username

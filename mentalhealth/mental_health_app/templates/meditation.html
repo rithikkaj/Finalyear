@@ -5,295 +5,373 @@
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8 text-center hero-content">
+
                 <h1 class="mb-4">
                     <i class="fas fa-om text-success"></i> Meditation
                 </h1>
+
                 <p class="lead mb-5">Take a moment to relax and focus your mind.</p>
 
                 <!-- Music Selection -->
                 <div class="music-selection mb-4">
+
                     <h5 class="mb-3 text-white">Choose Calm Music</h5>
+
                     <div class="music-buttons mb-3">
-                        <button class="btn btn-outline-light me-2 mb-2 music-btn" data-music="flute">
-                            🎵 Flute
-                        </button>
-                        <button class="btn btn-outline-light me-2 mb-2 music-btn" data-music="piano">
-                            🎹 Piano
-                        </button>
-                        <button class="btn btn-outline-light me-2 mb-2 music-btn" data-music="nature">
-                            🌿 Nature Sounds
-                        </button>
-                        <button class="btn btn-outline-light mb-2 music-btn" data-music="ocean">
-                            🌊 Ocean Waves
-                        </button>
+                        <button class="btn btn-outline-light me-2 mb-2 music-btn" data-music="flute">🎵 Flute</button>
+                        <button class="btn btn-outline-light me-2 mb-2 music-btn" data-music="piano">🎹 Piano</button>
+                        <button class="btn btn-outline-light me-2 mb-2 music-btn" data-music="nature">🌿 Nature</button>
+                        <button class="btn btn-outline-light mb-2 music-btn" data-music="ocean">🌊 Ocean</button>
                     </div>
+
                     <div class="music-controls">
                         <button class="btn btn-success me-2" id="playMusic">
                             <i class="fas fa-play"></i> Play Music
                         </button>
+
                         <button class="btn btn-danger" id="stopMusic" disabled>
                             <i class="fas fa-stop"></i> Stop Music
                         </button>
                     </div>
+
                 </div>
 
-                <!-- Timer Display -->
+                <!-- Timer -->
                 <div class="timer-container mb-4">
                     <div class="timer-display" id="timerDisplay">05:00</div>
                 </div>
 
-                <!-- Time Selection -->
+                <!-- Duration Selection -->
                 <div class="mb-4">
                     <h5 class="mb-3">Choose Duration</h5>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-outline-primary" id="set5Min">5 min</button>
-                        <button class="btn btn-outline-primary" id="set10Min">10 min</button>
-                        <button class="btn btn-outline-primary" id="set15Min">15 min</button>
+
+                    <div class="btn-group">
+
+                        <button class="btn btn-outline-primary time-btn" data-time="5">5 min</button>
+
+                        <button class="btn btn-outline-primary time-btn" data-time="10">10 min</button>
+
+                        <button class="btn btn-outline-primary time-btn" data-time="15">15 min</button>
+
                     </div>
                 </div>
 
-                <!-- Control Buttons -->
+                <!-- Controls -->
                 <div class="mb-4">
+
                     <button class="btn btn-success btn-lg me-2" id="startBtn">
                         <i class="fas fa-play"></i> Start
                     </button>
+
                     <button class="btn btn-warning btn-lg me-2" id="pauseBtn" disabled>
                         <i class="fas fa-pause"></i> Pause
                     </button>
+
                     <button class="btn btn-secondary btn-lg" id="resetBtn">
                         <i class="fas fa-redo"></i> Reset
                     </button>
+
                 </div>
- 
-                <!-- Status Message -->
-                <div id="message" class="alert alert-info" style="display: none;"></div>
+
+                <div id="message" class="alert alert-info" style="display:none;"></div>
+
             </div>
         </div>
     </div>
 </div>
 
-<3!-- Hidden Audio Element -->
-<audio id="meditationMusic" loop>
-    Your browser does not support the audio element.
-</audio>
+<!-- Hidden Audio -->
+<audio id="meditationMusic" loop></audio>
 
 <style>
-.hero-section {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?w=1200&h=600&fit=crop&crop=center') no-repeat center center !important;
-    background-size: cover !important;
-    color: #ffffff;
-    padding: 100px 0;
-    position: relative;
+
+.hero-section{
+background:linear-gradient(135deg,rgba(0,0,0,0.5),rgba(0,0,0,0.3)),
+url('https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?w=1200') center/cover;
+color:white;
+padding:100px 0;
 }
 
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
+.timer-display{
+font-size:4rem;
+font-weight:bold;
+color:#28a745;
+font-family:monospace;
 }
 
-.timer-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    position: relative;
-    z-index: 2;
+.music-btn.active{
+background:rgba(255,255,255,0.3);
+border-color:white;
 }
 
-.timer-display {
-    font-size: 4rem;
-    font-weight: bold;
-    color: #28a745;
-    font-family: monospace;
-}
-
-.btn-group .btn {
-    margin: 0 5px;
-    position: relative;
-    z-index: 10;
-    cursor: pointer;
-}
-
-.music-controls {
-    position: relative;
-    z-index: 2;
-}
-
-.music-btn.active {
-    background-color: rgba(255, 255, 255, 0.3);
-    border-color: #ffffff;
-}
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const timerDisplay = document.getElementById('timerDisplay');
-    const startBtn = document.getElementById('startBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const set5Min = document.getElementById('set5Min');
-    const set10Min = document.getElementById('set10Min');
-    const set15Min = document.getElementById('set15Min');
-    const messageDiv = document.getElementById('message');
-    const playMusicBtn = document.getElementById('playMusic');
-    const stopMusicBtn = document.getElementById('stopMusic');
-    const meditationMusic = document.getElementById('meditationMusic');
-    const musicButtons = document.querySelectorAll('.music-btn');
 
-    let totalSeconds = 300; // Default 5 minutes
-    let remainingSeconds = totalSeconds;
-    let interval;
-    let isRunning = false;
-    let isPaused = false;
+document.addEventListener("DOMContentLoaded",function(){
 
-    // Music sources
-    const musicSources = {
-        flute: 'https://www.youtube.com/results?search_query=flute+melody',
-        piano: 'https://www.youtube.com/results?search_query=piano+melody',
-        guitar: 'https://www.youtube.com/results?search_query=guitar+melody',
-        violin: 'https://www.youtube.com/results?search_query=violin+melody'
-    };
+const timerDisplay=document.getElementById("timerDisplay")
 
-    function updateDisplay() {
-        const minutes = Math.floor(remainingSeconds / 60);
-        const seconds = remainingSeconds % 60;
-        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
+const startBtn=document.getElementById("startBtn")
 
-    function startMeditation() {
-        if (!isRunning) {
-            isRunning = true;
-            isPaused = false;
-            startBtn.disabled = true;
-            pauseBtn.disabled = false;
-            disableTimeButtons(true);
+const pauseBtn=document.getElementById("pauseBtn")
 
-            interval = setInterval(() => {
-                remainingSeconds--;
-                updateDisplay();
+const resetBtn=document.getElementById("resetBtn")
 
-                if (remainingSeconds <= 0) {
-                    clearInterval(interval);
-                    showMessage('Meditation complete! Well done! 🌟', 'success');
-                    resetMeditation();
-                }
-            }, 1000);
-        }
-    }
+const messageDiv=document.getElementById("message")
 
-    function pauseMeditation() {
-        if (isRunning && !isPaused) {
-            clearInterval(interval);
-            isPaused = true;
-            pauseBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
-        } else if (isPaused) {
-            startMeditation();
-            pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-        }
-    }
+const playMusic=document.getElementById("playMusic")
 
-    function resetMeditation() {
-        clearInterval(interval);
-        isRunning = false;
-        isPaused = false;
-        remainingSeconds = totalSeconds;
-        updateDisplay();
-        startBtn.disabled = false;
-        pauseBtn.disabled = true;
-        pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-        disableTimeButtons(false);
-        messageDiv.style.display = 'none';
-    }
+const stopMusic=document.getElementById("stopMusic")
 
-    function setTime(minutes) {
-        if (!isRunning) {
-            totalSeconds = minutes * 60;
-            remainingSeconds = totalSeconds;
-            updateDisplay();
-        }
-    }
+const musicButtons=document.querySelectorAll(".music-btn")
 
-    function disableTimeButtons(disabled) {
-        set5Min.disabled = disabled;
-        set10Min.disabled = disabled;
-        set15Min.disabled = disabled;
-    }
+const timeButtons=document.querySelectorAll(".time-btn")
 
-    function showMessage(text, type) {
-        messageDiv.textContent = text;
-        messageDiv.className = `alert alert-${type}`;
-        messageDiv.style.display = 'block';
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 5000);
-    }
+let totalSeconds=300
 
-    function playMusic() {
-        meditationMusic.play().catch(e => {
-            console.log('Audio play failed:', e);
-        });
-        playMusicBtn.disabled = true;
-        stopMusicBtn.disabled = false;
-    }
+let remainingSeconds=300
 
-    function stopMusic() {
-        meditationMusic.pause();
-        meditationMusic.currentTime = 0;
-        playMusicBtn.disabled = false;
-        stopMusicBtn.disabled = true;
-    }
+let interval=null
 
-    function changeMusic(musicType) {
-        if (musicSources[musicType]) {
-            // Create or update embedded YouTube player
-            let playerDiv = document.getElementById('youtubePlayer');
-            if (!playerDiv) {
-                playerDiv = document.createElement('div');
-                playerDiv.id = 'youtubePlayer';
-                playerDiv.style.position = 'fixed';
-                playerDiv.style.bottom = '20px';
-                playerDiv.style.right = '20px';
-                playerDiv.style.width = '300px';
-                playerDiv.style.height = '200px';
-                playerDiv.style.zIndex = '1000';
-                playerDiv.innerHTML = `<iframe width="100%" height="100%" src="${musicSources[musicType]}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-                document.body.appendChild(playerDiv);
-            } else {
-                playerDiv.innerHTML = `<iframe width="100%" height="100%" src="${musicSources[musicType]}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-            }
-            // Highlight selected button
-            musicButtons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-    }
-    startBtn.addEventListener('click', startMeditation);
-    pauseBtn.addEventListener('click', pauseMeditation);
-    resetBtn.addEventListener('click', resetMeditation);
-    set5Min.addEventListener('click', () => setTime(5));
-    set10Min.addEventListener('click', () => setTime(10));
-    set15Min.addEventListener('click', () => setTime(15));
-    playMusicBtn.addEventListener('click', playMusic);
-    stopMusicBtn.addEventListener('click', stopMusic);
+let isRunning=false
 
-    // Music button event listeners
-    musicButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const musicType = e.target.getAttribute('data-music');
-            changeMusic(musicType);
-            // Highlight selected button
-            musicButtons.forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
-        });
-    });
+let isPaused=false
 
-    // Initialize
-    updateDisplay();
-    stopMusicBtn.disabled = true; // Initially disable stop button
-});
+
+const musicLinks={
+flute:"https://www.youtube.com/embed/1ZYbU82GVz4",
+
+piano:"https://www.youtube.com/embed/1ZYbU82GVz4",
+
+nature:"https://www.youtube.com/embed/eKFTSSKCzWA",
+
+ocean:"https://www.youtube.com/embed/V1RPi2MYptM"
+}
+
+
+function updateDisplay(){
+
+let minutes=Math.floor(remainingSeconds/60)
+
+let seconds=remainingSeconds%60
+
+timerDisplay.textContent=
+String(minutes).padStart(2,"0")+":"+String(seconds).padStart(2,"0")
+
+}
+
+
+function startMeditation(){
+
+if(!isRunning){
+
+isRunning=true
+
+pauseBtn.disabled=false
+
+startBtn.disabled=true
+
+
+interval=setInterval(()=>{
+
+remainingSeconds--
+
+updateDisplay()
+
+if(remainingSeconds<=0){
+
+clearInterval(interval)
+
+showMessage("Meditation Complete 🌟","success")
+
+resetMeditation()
+
+}
+
+},1000)
+
+}
+
+}
+
+
+function pauseMeditation(){
+
+if(!isPaused){
+
+clearInterval(interval)
+
+isPaused=true
+
+pauseBtn.innerHTML='<i class="fas fa-play"></i> Resume'
+
+}
+
+else{
+
+isPaused=false
+
+pauseBtn.innerHTML='<i class="fas fa-pause"></i> Pause'
+
+interval=setInterval(()=>{
+
+remainingSeconds--
+
+updateDisplay()
+
+if(remainingSeconds<=0){
+
+clearInterval(interval)
+
+showMessage("Meditation Complete 🌟","success")
+
+resetMeditation()
+
+}
+
+},1000)
+
+}
+
+}
+
+
+function resetMeditation(){
+
+clearInterval(interval)
+
+isRunning=false
+
+isPaused=false
+
+remainingSeconds=totalSeconds
+
+updateDisplay()
+
+startBtn.disabled=false
+
+pauseBtn.disabled=true
+
+pauseBtn.innerHTML='<i class="fas fa-pause"></i> Pause'
+
+}
+
+
+function setTime(minutes,button){
+
+if(!isRunning){
+
+totalSeconds=minutes*60
+
+remainingSeconds=totalSeconds
+
+updateDisplay()
+
+timeButtons.forEach(btn=>{
+
+btn.classList.remove("btn-primary")
+
+btn.classList.add("btn-outline-primary")
+
+})
+
+button.classList.remove("btn-outline-primary")
+
+button.classList.add("btn-primary")
+
+}
+
+}
+
+
+function showMessage(text,type){
+
+messageDiv.innerText=text
+
+messageDiv.className="alert alert-"+type
+
+messageDiv.style.display="block"
+
+setTimeout(()=>{
+
+messageDiv.style.display="none"
+
+},4000)
+
+}
+
+
+function playSelectedMusic(type){
+
+let player=document.getElementById("youtubePlayer")
+
+if(!player){
+
+player=document.createElement("div")
+
+player.id="youtubePlayer"
+
+player.style.position="fixed"
+
+player.style.bottom="20px"
+
+player.style.right="20px"
+
+player.style.width="300px"
+
+player.style.height="200px"
+
+document.body.appendChild(player)
+
+}
+
+player.innerHTML=`<iframe width="100%" height="100%" src="${musicLinks[type]}?autoplay=1" frameborder="0" allow="autoplay"></iframe>`
+
+}
+
+
+startBtn.addEventListener("click",startMeditation)
+
+pauseBtn.addEventListener("click",pauseMeditation)
+
+resetBtn.addEventListener("click",resetMeditation)
+
+
+timeButtons.forEach(btn=>{
+
+btn.addEventListener("click",()=>{
+
+let time=btn.getAttribute("data-time")
+
+setTime(time,btn)
+
+})
+
+})
+
+
+musicButtons.forEach(btn=>{
+
+btn.addEventListener("click",()=>{
+
+let type=btn.getAttribute("data-music")
+
+playSelectedMusic(type)
+
+musicButtons.forEach(b=>b.classList.remove("active"))
+
+btn.classList.add("active")
+
+})
+
+})
+
+
+updateDisplay()
+
+})
+
 </script>
+
 {% endblock %}
